@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Basket</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+        integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+
+<body>
+    <h1>{{ request.user.username }}</h1>
+    <section>
+        {% for item in request.session.items %}
+        <div class="product">
+            <div class="description">
+                <h3>{{ item.name }} - {{ item.quantity }}</h3>
+                <hr />
+                <div>
+                    <h5>€{{ item.total }}</h5>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <a href="{% url 'create-checkout-session' %}">checkout</a>
+    </section>
+</body>
+
+</html>

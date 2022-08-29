@@ -1,0 +1,21 @@
+<html>
+
+<head>
+    <title>Thanks for your order!</title>
+</head>
+
+<body>
+    <section>
+        <p>
+            We appreciate you gave us a chance and made a purchase on our website.
+        </p>
+        {% for item in order_items %}
+        <p>
+            {{ item.product.name }} - {{ item.quantity }}
+        </p>
+        {% endfor %}
+        <a href="{% url 'home' %}">Test again</a>
+    </section>
+</body>
+
+</html>
