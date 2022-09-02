@@ -1,11 +1,15 @@
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm, PasswordResetForm, SetPasswordForm
+from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm, PasswordResetForm, SetPasswordForm, AuthenticationForm
 from django.forms import ModelForm
 
-class LoginForm(ModelForm):
+class LoginForm(AuthenticationForm):
     class Meta:
         model = User
         fields = ('username', 'password')
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'class': "form-control giBold text-center"})
+        self.fields['password'].widget.attrs.update({'class': "form-control giBold text-center"})
 
 class SignupForm(UserCreationForm):
     class Meta:
