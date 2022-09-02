@@ -16,7 +16,7 @@ class HomeView(TemplateView):
 class ShopView(CustomLoginRequiredMixin, TemplateView):
     template_name = "shop.html"
     permission_denied_message = 'You have to be logged in to access that page'
-    login_url = '/'
+    login_url = '/login/'
     def get_context_data(self, **kwargs):
         products = get_prods()
         context = super(ShopView, self).get_context_data(**kwargs)

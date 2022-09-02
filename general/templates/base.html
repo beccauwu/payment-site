@@ -40,6 +40,19 @@
             <li class="nav-item">
                 <a href="{% url 'basket' %}" class="nav-link {{ nav_basket }}"><i class="fa-solid fa-basket-shopping"></i></a>
             </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Account
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Your Orders</a></li>
+                    <li><a class="dropdown-item" href="{% url logout %}">Logout</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="#">Something else here</a></li>
+                </ul>
+            </li>
             {% else %}
             <li class="nav-item">
                 <a href="{% url 'login' %}" class="nav-link" data-bs-toggle="tab">Shop</a>
@@ -49,15 +62,7 @@
             </li>
             {% endif %}
         </ul>
-        
         <!-- Tab panes -->
-        <!-- <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="home" role="tabpanel"></div>
-            <div class="tab-pane fade" id="pgadmin" role="tabpanel"></div>
-            <div class="tab-pane fade" id="admin" role="tabpanel"></div>
-            <div class="tab-pane fade" id="tab4Id" role="tabpanel"></div>
-            <div class="tab-pane fade" id="tab5Id" role="tabpanel"></div>
-        </div> -->
         
     </header>
 <main class="container-fluid">
