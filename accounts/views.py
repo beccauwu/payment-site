@@ -22,17 +22,21 @@ class LoginView(View):
         return redirect(request.META.get('HTTP_REFERER'))
     
     def post(self, request):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            user = authenticate(
-                username=form.cleaned_data['username'],
-                password=form.cleaned_data['password']
-                )
-            if user is not None:
+        user = authenticate(
+            username=request.POST['username'],
+            password=request.POST['password']
+            )
+        if user is not None:
+            if user.is_active:
                 login(request, user)
+                messages.success(request, 'You are now logged in')
                 return redirect('home')
-        messages.error(request, 'Invalid username or password')
-        return render(request, self.template_name, context={'form': form})
+            else:
+                messages.error(request, 'Your account is disabled')
+                return redirect('signup')
+        else:
+            messages.error(request, 'Invalid username or password')
+            return redirect('login')
 
 class SignupView(View):
     template_name = 'signup.html'
