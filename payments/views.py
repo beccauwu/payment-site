@@ -1,11 +1,9 @@
-import stripe
 from django.conf import settings
 from django.shortcuts import redirect
 from django.views import View
 from django.views.generic import TemplateView
 from payments.models import Product, Price, OrderItem
-
-stripe.api_key = settings.STRIPE_SECRET_KEY
+import general.stripe_stuff as stripe_funcs
 
 class CreateCheckoutSessionView(View):
 
@@ -21,23 +19,15 @@ class CreateCheckoutSessionView(View):
                 "quantity": int(item["quantity"])
             })
         print(line_items)
-        checkout_session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            line_items=line_items,
-            mode='payment',
-            success_url=settings.BASE_URL + '/purchases/success/',
-            cancel_url=settings.BASE_URL + '/purchases/cancel/',
-        )
-        return redirect(checkout_session.url)
+        return redirect(stripe_funcs.create_session(line_items))
 
 class SuccessView(TemplateView):
     template_name = "success.html"
     def get_context_data(self, **kwargs):
         context = super(SuccessView, self).get_context_data(**kwargs)
-        items = OrderItem.objects.filter(user=self.request.user)
-        context.update({'order_items': items})
-        for item in items:
-            item.delete()
+        items = stripe_funcs.empty_basket(self.request.user)
+        context.update({'items': items})
+        self.request.session['items'].clear()
         return context
 
 class CancelView(TemplateView):

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="wi-fc mx-auto bg-light mt-5 text-center p-4 rounded">
+    <h1 class="giBold text-black">{% block errorcode %}{% endblock %} -<br> {% block errordes %}{% endblock %}</h1>
+    <a class="d-block giBold pt-1 border-top border-black" href="{% url 'start' %}">Go to start page</a>
+    <small class="text-black">{% block errorextra %}{% endblock %}</small>
+</div>
+{% endblock %}

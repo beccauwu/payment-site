@@ -1,33 +1,6 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-    <title>Buy now</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script>
-    <script src="https://js.stripe.com/v3/"></script>
-</head>
-
-<body>
-    <h1>{{ request.user.username }}</h1>
-    <section>
-        {% for price in prices %}
-        <div class="product">
-            <div class="description">
-                <h3>{{ price.product.name }}</h3>
-                <hr />
-                <div>
-                    <h5>€{{ price.price }}</h5>
-                    <form action="{% url 'add_to_cart' price.id %}" method="POST">
-                        {% csrf_token %}
-                        <button type="submit">Add to cart</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-        <a href="{% url 'basket' %}">open basket</a>
-    </section>
-</body>
-
-</html>
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<h1 class="text-black">{{ request.user.username }}</h1>
+{% endblock %}

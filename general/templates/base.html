@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="shop, cool, products">
+    <meta name="description" content="a place to buy cool products">
+    <link rel="stylesheet" href="{% static 'css/main.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+        integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.0/js/bootstrap.bundle.min.js"
+        integrity="sha512-9GacT4119eY3AcosfWtHMsT5JyZudrexyEVzTBWV3viP/YfB9e2pEy3N7WXL3SV6ASXpTU0vzzSxsbfsuUH4sQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <title>{% block title %}{% endblock %} - perttula.co</title>
+</head>
+<body>
+    <header>
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" id="mainNav" role="tablist">
+            <li class="nav-item">
+                <a href="{% url 'home' %}" class="nav-link {{ nav_home }}" aria-current="page">Home</a>
+            </li>
+            <!-- <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Admin</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#pgadmin">pgAdmin</a>
+                    <a class="dropdown-item" href="#admin">Django Admin</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#tab4Id"></a>
+                </div>
+            </li> -->
+            {% if request.user.is_authenticated %}
+            <li class="nav-item">
+                <a href="{% url 'shop' %}" class="nav-link {{ nav_shop }}">Shop</a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'basket' %}" class="nav-link {{ nav_basket }}"><i class="fa-solid fa-basket-shopping"></i></a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+                <a href="{% url 'login' %}" class="nav-link" data-bs-toggle="tab">Shop</a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'login' %}" class="nav-link" data-bs-toggle="tab"><i class="fa-solid fa-basket-shopping"></i></a>
+            </li>
+            {% endif %}
+        </ul>
+        
+        <!-- Tab panes -->
+        <!-- <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="home" role="tabpanel"></div>
+            <div class="tab-pane fade" id="pgadmin" role="tabpanel"></div>
+            <div class="tab-pane fade" id="admin" role="tabpanel"></div>
+            <div class="tab-pane fade" id="tab4Id" role="tabpanel"></div>
+            <div class="tab-pane fade" id="tab5Id" role="tabpanel"></div>
+        </div> -->
+        
+    </header>
+<main class="container-fluid">
+{% if messages %}
+{% for message in messages %}
+<div class="d-flex alert alert-{{ message.tags }} fade show alert-dismissible text-center wi-fc mx-auto mt-2 ps-5"
+    role="alert">
+    <p class="mt-3">{{ message }}</p>
+    <button type="button"
+        class="btn btn-outline-primary fs-5 border-0 fa-solid fa-xmark ms-3 float-end align-self-center"
+        data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% block content %}
+{% endblock %}
+</main>
+<script src="https://kit.fontawesome.com/cd478b5352.js" crossorigin="anonymous"></script>
+</body>
+</html>
