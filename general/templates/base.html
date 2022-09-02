@@ -55,10 +55,7 @@
             </li>
             {% else %}
             <li class="nav-item">
-                <a href="{% url 'login' %}" class="nav-link" data-bs-toggle="tab">Shop</a>
-            </li>
-            <li class="nav-item">
-                <a href="{% url 'login' %}" class="nav-link" data-bs-toggle="tab"><i class="fa-solid fa-basket-shopping"></i></a>
+                <a href="{% url 'login' %}" class="nav-link {{ nav_login }}" data-bs-toggle="tab">Login</a>
             </li>
             {% endif %}
         </ul>
