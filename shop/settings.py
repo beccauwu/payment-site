@@ -24,10 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-=w+^e#vynzh034r0(cdwx%u&i_m9hqu@*29_8%i(n0n+atabvn'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
+DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS', default='*', cast=lambda v: [s.strip() for s in v.split(' ')])
-CSRF_TRUSTED_ORIGINS = config('DJANGO_TRUSTED_ORIGINS', default='*', cast=lambda v: [s.strip() for s in v.split(' ')])
+CSRF_TRUSTED_ORIGINS = config('DJANGO_TRUSTED_ORIGINS', default='http://127.0.0.1:8000', cast=lambda v: [s.strip() for s in v.split(' ')])
 
 
 # Application definition
@@ -67,6 +66,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'accounts.context-processors.account_forms',
             ],
         },
     },
@@ -77,6 +77,7 @@ WSGI_APPLICATION = 'shop.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+
 
 DATABASES = {
     'default': {
@@ -133,7 +134,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
-
+STATIC_ROOT = BASE_DIR / 'static'
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
@@ -141,9 +142,26 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STRIPE_PUBLIC_KEY = config('STRIPE_PUBLIC')
 STRIPE_SECRET_KEY = config('STRIPE_SECRET')
-BASE_URL = 'http://127.0.0.1:8000'
+BASE_URL = 'http://127.0.0.1:8000' if DEBUG else CSRF_TRUSTED_ORIGINS
 
 from django.contrib.messages import constants as messages
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
+
+## EMAIL SETTINGS
+# EMAIL_HOST = config('EMAIL_HOST')
+# EMAIL_PORT = config('EMAIL_PORT')
+# EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_BACKEND = config('EMAIL_BACKEND')
+ANYMAIL = {
+    "MAILGUN_API_KEY": config('MAILGUN_API_KEY'),
+    "MAILGUN_API_URL": config('MAILGUN_API_URL'),
+    "MAILGUN_SENDER_DOMAIN": config('MAILGUN_SENDER_DOMAIN'),
+    }
+# EMAIL_USE_TLS = config('EMAIL_USE_TLS')
+
+CELERY_TIMEZONE = "Europe/Stovkholm"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
