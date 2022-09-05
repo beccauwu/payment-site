@@ -55,7 +55,8 @@
             </li>
             {% else %}
             <li class="nav-item">
-                <a href="{% url 'login' %}" class="nav-link {{ nav_login }}">Login</a>
+                <a class="nav-link" data-bs-toggle="modal" data-bs-target="#loginModal"
+                            aria-label="log in to your account">Login</a>
             </li>
             {% endif %}
         </ul>
@@ -63,6 +64,15 @@
         
     </header>
 <main class="container-fluid">
+{% if alert %}
+<div class="d-flex alert alert-{{ alert.type }} fade show alert-dismissible text-center wi-fc mx-auto mt-2 ps-5"
+    role="alert">
+    <p class="mt-3 giBold">{{ alert.message }}</p>
+    <button type="button"
+        class="btn btn-outline-primary fs-5 border-0 fa-solid fa-xmark ms-3 float-end align-self-center"
+        data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
 {% if messages %}
 {% for message in messages %}
 <div class="d-flex alert alert-{{ message.tags }} fade show alert-dismissible text-center wi-fc mx-auto mt-2 ps-5"
@@ -77,6 +87,9 @@
 {% block content %}
 {% endblock %}
 </main>
+{% if not request.user.is_authenticated %}
+{% include 'auth/modals.html' %}
+{% endif %}
 <script src="https://kit.fontawesome.com/cd478b5352.js" crossorigin="anonymous"></script>
 </body>
 </html>
