@@ -6,65 +6,97 @@
                 <h5 class="modal-title giBold text-black" id="loginModalTitle">Login</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <form method="post" id="loginModalForm" action="{% url 'login' %}">
-                    {% csrf_token %}
-                    {{login_form.username}}
-                    {{login_form.password}}
-                </form>
+            <div class="modal-body" id="formContainer" last="login">
+                <div id="formContainer" class="my-2">
+                    <form method="post" id="loginModalForm" action="{% url 'login' %}">
+                        {% csrf_token %}
+                        {{login_form.username}}
+                        {{login_form.password}}
+                    </form>
+                </div>
             </div>
             <div class="modal-footer">
                 <div class="wi-fc mx-auto">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-secondary" data-bs-target="#signupModal"
-                        data-bs-toggle="modal">Sign up
+                    <button type="button" class="btn btn-secondary" id="switchFormBtn">Sign up
                         instead</button>
-                    <button type="submit" class="btn btn-primary giBold" form="loginModalForm">Log in</button>
+                    <button type="submit" class="btn btn-primary giBold" form="loginModalForm" id="modal1Submit">Log in</button>
                 </div>
             </div>
-            <a href="{% url 'password_reset' %}" class="text-center">Forgot password?</a>
-        </div>
-    </div>
-</div>
-<div class="modal fade" tabindex="-1" aria-labelledby="signupModalTitle" aria-hidden="true" id="signupModal">
-    <div class="modal-dialog">
-        <div class="modal-content text-center">
-            <div class="modal-header">
-                <h5 class="modal-title giBold text-black" id="signupModalTitle">Sign up</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="post" id="signupModalForm" action="{% url 'signup' %}">
-                    {% csrf_token %}
-                    {{signup_form.username}}
-                    {{signup_form.email}}
-                    {{signup_form.password1}}
-                    {{signup_form.password2}}
-                    <div class="border-top border-black mt-1 pt-2">
-                        <input class="form-check-input" name="policytosConsent" type="checkbox" value="" id="tosCheck">
-                        <label class="form-check-label text-black giBold" for="tosCheck">
-                            By clicking here you confirm that you have read,<br> and agree to our Terms of Use
-                            and Privacy Notice
-                    </div>
-
-                </form>
-            </div>
-            <div class="modal-footer">
-                <div class="wi-fc mx-auto">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-secondary" data-bs-target="#loginModal"
-                        data-bs-toggle="modal">Log in
-                        instead</button>
-                    <button type="button" id="signupBtn" class="btn btn-secondary giBold" form="signupModalForm">Sign
-                        up</button>
-                </div>
-            </div>
+            <a href=".login-collapse" data-bs-toggle="collapse"
+                class="text-center mb-2" role="button" aria-expanded="false"
+                aria-controls="resetForm"
+                id="resetLink">Forgot password?</a>
         </div>
     </div>
 </div>
 <script>
-    $('#tosCheck').change(function () {
-        $('#signupBtn').toggleClass('btn-secondary').toggleClass('btn-primary');
-        $(this).is(':checked') ? $('#signupBtn').attr('type', 'submit') : $('#signupBtn').attr('type', 'button');
+    const loginform = `
+    <form method="post" id="loginForm" action="{% url 'login' %}">
+        {% csrf_token %}
+        {{login_form.username}}
+        {{login_form.password}}
+    </form>
+    `
+    const resetform = `
+    <form method="post" id="resetForm" action="{% url 'password_reset' %}">
+        {% csrf_token %}
+        <label for="resetFormEmail" class="giBold">Enter your email address:</label>
+        {{reset_form.email}}
+    </form>
+    `
+    const signupform = `
+    <form method="post" id="signupForm" action="{% url 'signup' %}">
+        {% csrf_token %}
+        {{signup_form.username}}
+        {{signup_form.email}}
+        {{signup_form.password1}}
+        {{signup_form.password2}}
+        <div class="border-top border-black mt-3 pt-2">
+            <input class="form-check-input" name="policytosConsent" type="checkbox" value="" id="tosCheck">
+            <label class="form-check-label text-black giBold" for="tosCheck">
+                By clicking here you confirm that you have read,<br> and agree to our Terms of Use
+                and Privacy Notice
+        </div>
+    </form>
+    `
+    const reset = _ => {
+        $('#loginModalTitle').text('Reset password');
+        $('#modal1Submit').attr('form', 'resetForm').text('Reset')
+        $('#formContainer').html(resetform);
+        $('#resetLink').hide();
+        $('#switchFormBtn').text('Log in instead');
+    }
+    const login = _ => {
+        $('#loginModalTitle').text('Login');
+        $('#modal1Submit').attr('form', 'loginModalForm').text('Log in').removeClass('btn-secondary').addClass('btn-primary');
+        $('#formContainer').html(loginform);
+        $('#switchFormBtn').text('Sign up instead');
+        $('#resetLink').show();
+    }
+    const signup = _ => {
+        $('#modal1Submit').removeClass('btn-primary').addClass('btn-secondary').attr('form', 'signupModalForm').text('Sign up');
+        $('#loginModalTitle').text('Sign up');
+        $('#formContainer').html(signupform);
+        $('#tosCheck').change(function () {
+            $('#modal1Submit').toggleClass('btn-secondary').toggleClass('btn-primary');
+            $(this).is(':checked') ? $('#modal1Submit').attr('type', 'submit') : $('#modal1Submit').attr('type', 'button');
+        });
+        $('#switchFormBtn').text('Log in instead');
+        $('#resetLink').hide();
+    }
+    const islogin = _ => $('#modal1Submit').attr('form') == 'loginModalForm';
+
+    $('#resetLink').click(function (event) {
+        event.preventDefault();
+        $('#formContainer').slideUp();
+        islogin() ? reset() : login();
+        $('#formContainer').slideDown(500);
+    });
+    $('#switchFormBtn').click(function (event) {
+        event.preventDefault();
+        $('#formContainer').slideUp();
+        islogin() ? signup() : login();
+        $('#formContainer').slideDown(500);
     });
 </script>

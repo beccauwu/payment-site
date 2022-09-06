@@ -9,8 +9,20 @@ class LoginForm(AuthenticationForm):
         fields = ('username', 'password')
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['username'].widget.attrs.update({'class': "form-control giBold text-center"})
-        self.fields['password'].widget.attrs.update({'class': "form-control giBold text-center"})
+        self.fields['username'].widget.attrs.update(
+            {
+                'class': "form-control giBold text-center",
+                'id': 'loginFormUsername',
+                'autocomplete':'username'
+            }
+        )
+        self.fields['password'].widget.attrs.update(
+            {
+                'class': "form-control giBold text-center mt-2",
+                'id': 'loginFormPassword',
+                'autocomplete':'current-password'
+            }
+        )
     
     def user_login(self):
         user = authenticate(username=self.cleaned_data['username'], password=self.cleaned_data['password'])
@@ -24,10 +36,36 @@ class SignupForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['password1'].widget.attrs.update({'class': 'form-control text-center', 'placeholder': 'Password'})
-        self.fields['password2'].widget.attrs.update({'class': 'form-control text-center', 'placeholder': 'Confirm Password'})
-        self.fields['username'].widget.attrs.update({'class': 'form-control text-center', 'placeholder': 'Username'})
-        self.fields['email'].widget.attrs.update({'class': 'form-control text-center', 'placeholder': 'Email'})
+        self.fields['password1'].widget.attrs.update(
+            {
+                'class': 'form-control text-center mt-2',
+                'placeholder': 'Password',
+                'id': 'signupFormPassword1',
+                'autocomplete': 'new-password'
+             })
+        self.fields['password2'].widget.attrs.update(
+            {
+                'class': 'form-control text-center mt-2',
+                'placeholder': 'Confirm Password',
+                'id': 'signupFormPassword2',
+                'autocomplete': 'new-password'
+            })
+        self.fields['username'].widget.attrs.update(
+            {
+                'class': 'form-control text-center',
+                'placeholder': 'Username',
+                'id': 'signupFormUsername',
+                'autocomplete': 'username'
+            }
+        )
+        self.fields['email'].widget.attrs.update(
+            {
+                'class': 'form-control text-center mt-2',
+                'placeholder': 'Email',
+                'id': 'signupFormEmail',
+                'autocomplete': 'email'
+            }
+        )
 
 class CustomPasswordChangeForm(PasswordChangeForm):
     class Meta:
@@ -36,9 +74,9 @@ class CustomPasswordChangeForm(PasswordChangeForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['old_password'].widget.attrs.update({'class': 'form-control'})
-        self.fields['new_password1'].widget.attrs.update({'class': 'form-control'})
-        self.fields['new_password2'].widget.attrs.update({'class': 'form-control'})
+        self.fields['old_password'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Old Password', 'id': 'oldPassword'})
+        self.fields['new_password1'].widget.attrs.update({'class': 'form-control', 'placeholder': 'New Password', 'id': 'newPassword1'})
+        self.fields['new_password2'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Confirm New Password', 'id': 'newPassword2'})
 
 class CustomPasswordResetForm(PasswordResetForm):
     class Meta:
@@ -47,7 +85,13 @@ class CustomPasswordResetForm(PasswordResetForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['email'].widget.attrs.update({'class': 'form-control'})
+        self.fields['email'].widget.attrs.update(
+            {
+                'class': 'form-control my-2 text-center',
+                'id': 'resetFormEmail',
+                'autocomplete': 'email'
+            }
+        )
     def get_users(self, email):
         users = super().get_users(email)
         try:

@@ -1,11 +1,16 @@
+amqp
 asgiref
+billiard
+celery
 certifi
 charset-normalizer
 Django
+django-anymail
 idna
 python-decouple
 requests
 sqlparse
+six
 stripe
 tzdata
 urllib3
