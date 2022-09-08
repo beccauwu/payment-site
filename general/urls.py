@@ -8,4 +8,5 @@ urlpatterns = [
     path('basket/add/<int:pk>', views.add_to_cart, name='add_to_cart'),
     path('basket/subtract/<int:pk>', views.subtract_from_cart, name='subtract_from_cart'),
     path('basket/remove/<int:pk>', views.remove_from_cart, name='remove_from_cart'),
+    path('testint/', views.APITest.as_view(), name='test'),
 ]
