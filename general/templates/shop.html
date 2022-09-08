@@ -2,8 +2,8 @@
 {% load static %}
 {% block title %}Shop{% endblock %}
 {% block content %}
-<div class="row g-2 mt-3">
-{% for product in products %}
+<div class="row g-2 mt-3" id="products">
+<!-- {% for product in products %}
 <div class="product col rounded bg-light wi-fc text-center">
     <div class="description mx-auto" style="width:100px;">
         <img class="d-block mx-auto rounded-circle" src="{{ product.img }}" alt="product image" width="100">
@@ -14,6 +14,9 @@
     </div>
     <a href="{% url 'add_to_cart' product.id %}" class="btn btn-sm btn-primary">Add to cart</a>
 </div>
-{% endfor %}
+{% endfor %} -->
 </div>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/shop.js' %}"></script>
 {% endblock %}
