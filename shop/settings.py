@@ -38,9 +38,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
+    'rest_framework',
     'payments',
     'general',
     'accounts',
+    'messaging',
 ]
 
 MIDDLEWARE = [
@@ -165,3 +168,8 @@ ANYMAIL = {
 CELERY_TIMEZONE = "Europe/Stovkholm"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
+
+GRAPH_MODELS = {
+  'all_applications': True,
+  'group_models': True,
+}
