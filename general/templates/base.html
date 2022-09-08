@@ -33,13 +33,13 @@
                     <a class="dropdown-item" href="#tab4Id"></a>
                 </div>
             </li> -->
-            {% if request.user.is_authenticated %}
             <li class="nav-item">
                 <a href="{% url 'shop' %}" class="nav-link {{ nav_shop }}">Shop</a>
             </li>
             <li class="nav-item">
                 <a href="{% url 'basket' %}" class="nav-link {{ nav_basket }}"><i class="fa-solid fa-basket-shopping"></i></a>
             </li>
+            {% if request.user.is_authenticated %}
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     Account
@@ -91,5 +91,7 @@
 {% include 'auth/modals.html' %}
 {% endif %}
 <script src="https://kit.fontawesome.com/cd478b5352.js" crossorigin="anonymous"></script>
+{% block scripts %}
+{% endblock %}
 </body>
 </html>
