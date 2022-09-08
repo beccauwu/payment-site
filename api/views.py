@@ -1,7 +1,8 @@
+from datetime import datetime
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import permissions
-from payments.models import Product, Price
+from payments.models import Product, Price, Order
 from django.contrib.sessions.models import Session
 from django.http import Http404
 from .serializers import ProductSerializer
@@ -24,6 +25,7 @@ class Basket:
         for product in products:
             self.basket[str(product.id)]['product'] = product
         for item in self.basket.values():
+            item['price_id'] = Price.objects.get(product=item['product']).stripe_price_id
             item['price'] = float(item['price'])
             item['total_price'] = item['price'] * item['quantity']
             yield item
@@ -56,6 +58,15 @@ class Basket:
             if product_id in self.basket:
                 del self.basket[product_id]
         self.save()
+    def create_session(self):
+        line_itms = []
+        for itm in list(self):
+            line_itms.append({
+                'price': itm['price_id'],
+                'quantity': itm['quantity'],
+            })
+        session = stripe.create_session(line_itms)
+        return session
 
 class BasketAPI(APIView):
 
@@ -86,6 +97,30 @@ class BasketAPI(APIView):
         product = Product.objects.get(id=product_id)
         basket.clear(product)
         return Response(basket.basket)
+
+class SessionAPI(APIView):
+    def get(self, request):
+        basket = Basket(request)
+        session = basket.create_session()
+        user = None
+        if request.user.is_authenticated:
+            user = request.user
+        order = Order.objects.create(
+            user=user,
+            session=request.session.session_key,
+            stripe_session_id=session['id'],
+        )
+        order.save()
+        return Response({'session_url': session.url})
+    def post(self, request):
+        basket = Basket(request)
+        order = Order.objects.get(stripe_session_id=request.data['session_id'])
+        order.completed = True
+        order.paid = True
+        order.paid_on = datetime.now()
+        order.save()
+        basket.clear(delete_all=True)
+        return Response('success')
 
 class GetProductsAPI(APIView):
     def get(self, request):
