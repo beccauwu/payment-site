@@ -1,7 +1,9 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm, PasswordResetForm, SetPasswordForm, AuthenticationForm
 from django.contrib.auth import login, authenticate
-from django.forms import ModelForm
+from django import forms
+from payments.models import Order
+
 
 class LoginForm(AuthenticationForm):
     class Meta:
@@ -109,3 +111,6 @@ class PasswordSetForm(SetPasswordForm):
         super().__init__(*args, **kwargs)
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class': 'form-control'})
+
+class OrderRegisterForm(forms.Form):
+    order_id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Order ID'}))
