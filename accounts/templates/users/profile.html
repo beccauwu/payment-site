@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% for order in request.user.orders %}
+    {% if not order.completed %}
+    you have an unfinished session. checkout now?
+    {% else %}
+    {{ order.date }}: {{ order.stripe_session_id }}
+        {% if order.paid %}
+        paid on {{ order.paid_on }}
+        {% else %}
+        not paid
+        {% endif %}
+            {% for item in order.items %}
+            {{ item.product.name }}: {{ item.quantity }} €{{ item.get_total_item_price }}
+            {% endfor %}
+            total: €{{ order.get_total }}
+    {% endif %}
+{% endfor %}
