@@ -32,6 +32,7 @@ CSRF_TRUSTED_ORIGINS = config('DJANGO_TRUSTED_ORIGINS', default='http://127.0.0.
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -173,3 +174,17 @@ GRAPH_MODELS = {
   'all_applications': True,
   'group_models': True,
 }
+
+try:
+    import jupyterlab
+    notebook_default_url = '/lab'  # Using JupyterLab
+except ImportError:
+    notebook_default_url = '/tree'  # Using Jupyter
+
+NOTEBOOK_ARGUMENTS = [
+    '--ip', '0.0.0.0',
+    '--port', '8888',
+    '--notebook-dir', 'notebooks',
+    '--NotebookApp.default_url', notebook_default_url,
+]
+IPYTHON_KERNEL_DISPLAY_NAME = 'Django Kernel'
