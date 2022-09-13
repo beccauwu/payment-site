@@ -22,6 +22,19 @@ def create_customer(email, name, tax=None):
         tax_exempt=tax
     )
 
+def retrieve_customer(id):
+    return stripe.Customer.retrieve(id)
+
+def create_payment_intent(amount, currency, customer=None):
+    intent = stripe.PaymentIntent.create(
+        amount=amount,
+        currency=currency,
+        customer=customer,
+        payment_method_types=['card'],
+    )
+    print(intent)
+    return intent
+
 # def get_prods():
 #     response = stripe.Product.list(limit=3)
 #     objs = []
