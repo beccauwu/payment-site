@@ -13,12 +13,12 @@ class Category(models.Model):
         return self.name
 
 class Product(models.Model):
-    name = models.CharField(max_length=255)
+    prod_name = models.CharField(max_length=255)
     stripe_product_id = models.CharField(max_length=255)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
     img = models.CharField(max_length=255, blank=True, null=True)
     def __str__(self):
-        return self.name
+        return self.prod_name
     def get_image(self):
         return stripe.get_image(self.stripe_product_id)
     def delete_from_stripe(self):

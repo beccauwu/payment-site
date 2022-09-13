@@ -41,63 +41,66 @@ class ShopView(TemplateView):
 class BasketView(TemplateView):
     template_name = "basket.html"
 
-    def get_context_data(self, **kwargs):
-        context = super(BasketView, self).get_context_data(**kwargs)
-        context_list = []
-        order = Order.objects.filter(session=self.request.session)
-        for item in OrderItem.objects.filter(order=order):
-            context_list.append(
-                {
-                    'name': item.product.name,
-                    'quantity': item.quantity,
-                    'total': item.get_total_item_price(),
-                    'prod_id': item.product.id,
-                })
-        self.request.session['items'] = get_basket(self.request.user)
-        context['nav_basket'] = 'active'
-        return context
+class CheckoutView(TemplateView):
+    template_name = "checkout.html"
+
+#     def get_context_data(self, **kwargs):
+#         context = super(BasketView, self).get_context_data(**kwargs)
+#         context_list = []
+#         order = Order.objects.filter(session=self.request.session)
+#         for item in OrderItem.objects.filter(order=order):
+#             context_list.append(
+#                 {
+#                     'name': item.product.name,
+#                     'quantity': item.quantity,
+#                     'total': item.get_total_item_price(),
+#                     'prod_id': item.product.id,
+#                 })
+#         self.request.session['items'] = get_basket(self.request.user)
+#         context['nav_basket'] = 'active'
+#         return context
 
 class APITest(TemplateView):
     template_name = "test_api.html"
 
-def add_to_cart(request, pk):
-    product = Product.objects.get(price__id=pk)
-    session_key = request.session.session_key
-    if not Session.objects.filter(session_key=request.session.session_key).exists():
-        request.session.create()
-        print(f'session created: {session_key}')
-    if request.user.is_authenticated:
-        order, order_created = Order.objects.get_or_create(user=request.user, session=session_key)
-    else:
-        order, order_created = Order.objects.get_or_create(session=session_key)
-    order.save()
-    order_item, item_created = OrderItem.objects.get_or_create(order=order, product=product)
-    if not item_created:
-        order_item.quantity += 1
-    order_item.save()
-    request.session['items'] = get_basket(order)
-    print(request.session['items'])
-    return redirect(request.META.get('HTTP_REFERER'))
+# def add_to_cart(request, pk):
+#     product = Product.objects.get(price__id=pk)
+#     session_key = request.session.session_key
+#     if not Session.objects.filter(session_key=request.session.session_key).exists():
+#         request.session.create()
+#         print(f'session created: {session_key}')
+#     if request.user.is_authenticated:
+#         order, order_created = Order.objects.get_or_create(user=request.user, session=session_key)
+#     else:
+#         order, order_created = Order.objects.get_or_create(session=session_key)
+#     order.save()
+#     order_item, item_created = OrderItem.objects.get_or_create(order=order, product=product)
+#     if not item_created:
+#         order_item.quantity += 1
+#     order_item.save()
+#     request.session['items'] = get_basket(order)
+#     print(request.session['items'])
+#     return redirect(request.META.get('HTTP_REFERER'))
 
-def subtract_from_cart(request, pk):
-    product = Product.objects.get(price__id=pk)
-    if request.user.is_authenticated:
-        order = Order.objects.get(product=product, user=request.user)
-    else:
-        order = Order.objects.get(product=product, session=request.session)
-    order_item = OrderItem.objects.get(product=product, order=order)
-    if order_item.quantity > 1:
-        order_item.quantity -= 1
-        order_item.save()
-    else:
-        order_item.delete()
-    request.session['items'] = get_basket(order)
-    return redirect(request.META.get('HTTP_REFERER'))
+# def subtract_from_cart(request, pk):
+#     product = Product.objects.get(price__id=pk)
+#     if request.user.is_authenticated:
+#         order = Order.objects.get(product=product, user=request.user)
+#     else:
+#         order = Order.objects.get(product=product, session=request.session)
+#     order_item = OrderItem.objects.get(product=product, order=order)
+#     if order_item.quantity > 1:
+#         order_item.quantity -= 1
+#         order_item.save()
+#     else:
+#         order_item.delete()
+#     request.session['items'] = get_basket(order)
+#     return redirect(request.META.get('HTTP_REFERER'))
 
-def remove_from_cart(request, pk):
-    order = Order.objects.get(session=request.session)
-    product = Product.objects.get(price__id=pk)
-    order_item = OrderItem.objects.get(product=product, user=request.user)
-    order_item.delete()
-    request.session['items'] = get_basket(request.user)
-    return redirect(request.META.get('HTTP_REFERER'))
+# def remove_from_cart(request, pk):
+#     order = Order.objects.get(session=request.session)
+#     product = Product.objects.get(price__id=pk)
+#     order_item = OrderItem.objects.get(product=product, user=request.user)
+#     order_item.delete()
+#     request.session['items'] = get_basket(request.user)
+#     return redirect(request.META.get('HTTP_REFERER'))

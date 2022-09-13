@@ -16,3 +16,7 @@ tzdata
 urllib3
 gunicorn
 psycopg2-binary
+uvicorn
+djangorestframework
+channels["daphne"]
+django-rest-live
