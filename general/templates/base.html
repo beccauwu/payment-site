@@ -15,54 +15,76 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.0/js/bootstrap.bundle.min.js"
         integrity="sha512-9GacT4119eY3AcosfWtHMsT5JyZudrexyEVzTBWV3viP/YfB9e2pEy3N7WXL3SV6ASXpTU0vzzSxsbfsuUH4sQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    {% block head %}
+    {% endblock %}
     <title>{% block title %}{% endblock %} - perttula.co</title>
 </head>
 <body>
-    <header>
+    <nav class="navbar navbar-expand-lg bg-light">
         <!-- Nav tabs -->
-        <ul class="nav nav-tabs" id="mainNav" role="tablist">
-            <li class="nav-item">
-                <a href="{% url 'home' %}" class="nav-link {{ nav_home }}" aria-current="page">Home</a>
-            </li>
-            <!-- <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Admin</a>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item" href="#pgadmin">pgAdmin</a>
-                    <a class="dropdown-item" href="#admin">Django Admin</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#tab4Id"></a>
-                </div>
-            </li> -->
-            <li class="nav-item">
-                <a href="{% url 'shop' %}" class="nav-link {{ nav_shop }}">Shop</a>
-            </li>
-            <li class="nav-item">
-                <a href="{% url 'basket' %}" class="nav-link {{ nav_basket }}"><i class="fa-solid fa-basket-shopping"></i></a>
-            </li>
-            {% if request.user.is_authenticated %}
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Account
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Your Orders</a></li>
-                    <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
-                    <li>
-                        <hr class="dropdown-divider">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="fa-solid fa-bars"></span>
+            </button>
+            <div class="collapse navbar-collapse show" id="navbarNavDropdown">
+                <ul class="nav" id="mainNav">
+                    <li class="nav-item">
+                        <a href="{% url 'home' %}" class="nav-link {{ nav_home }}" aria-current="page">Home</a>
                     </li>
-                    <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    <li class="nav-item">
+                        <a href="{% url 'shop' %}" class="nav-link {{ nav_shop }}">Shop</a>
+                    </li>
+                    {% if request.user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Account
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Your Orders</a></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="modal" data-bs-target="#loginModal"
+                                    aria-label="log in to your account">Login</a>
+                    </li>
+                    {% endif %}
                 </ul>
-            </li>
-            {% else %}
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="modal" data-bs-target="#loginModal"
-                            aria-label="log in to your account">Login</a>
-            </li>
-            {% endif %}
-        </ul>
+            
+            </div>
+            <span class="float-lg-end">
+                <a href="#offCanvas" id="basket" class="btn btn-sm"
+                    data-bs-toggle="offcanvas" data-bs-target="#offCanvas" role="button" aria-controls="offCanvas">
+                    <i class="fa-solid fa-basket-shopping"></i> Basket<span class="badge"></span>
+                </a>
+            </span>
+        </div>
         <!-- Tab panes -->
-        
-    </header>
+    </nav>
+    <!--end container -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offCanvas" aria-labelledby="offCanvasLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title giBold" id="offCanvasLabel">Basket</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="shopping-basket">
+            <div class="shopping-basket-items" id="basket-items">
+            </div>
+            <div class="shopping-basket-total mt-3 ms-2 fs-5">
+                <span class="lighter-text giBold">Total:</span>
+                <span class="main-color-text" id="basket-total"></span>
+                <button class="btn btn-primary btn-sm d-inline float-end me-2">Checkout</button>
+            </div>
+        </div>
+    </div>
+</div>
 <main class="container-fluid">
 {% if alert %}
 <div class="d-flex alert alert-{{ alert.type }} fade show alert-dismissible text-center wi-fc mx-auto mt-2 ps-5"
@@ -72,6 +94,7 @@
         class="btn btn-outline-primary fs-5 border-0 fa-solid fa-xmark ms-3 float-end align-self-center"
         data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
+
 {% endif %}
 {% if messages %}
 {% for message in messages %}
@@ -91,6 +114,11 @@
 {% include 'auth/modals.html' %}
 {% endif %}
 <script src="https://kit.fontawesome.com/cd478b5352.js" crossorigin="anonymous"></script>
+<script src="{% static 'js/main.js' %}"></script>
+<script src="{% static 'js/shop.js' %}"></script>
+<script>
+    const spinner = `<img src="{% static 'img/spinner.svg' %}" alt="spinner" />`
+</script>
 {% block scripts %}
 {% endblock %}
 </body>
