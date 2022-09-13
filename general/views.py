@@ -2,10 +2,14 @@ from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
 from django.contrib.sessions.models import Session
 from .mixins import CustomLoginRequiredMixin
-from payments.models import Product, Price, Order, OrderItem
+from payments.models import Product, Price, Order
 # from .stripe_stuff import get_prods, get_basket
 from pprint import pprint
 from shop.frequents import Messages, referrer_redirect
+from .stripe_stuff import create_payment_intent
+from api.views import Basket
+from accounts.models import Profile
+from django.conf import settings
 # Create your views here.
 
 class HomeView(TemplateView):
@@ -18,7 +22,6 @@ class HomeView(TemplateView):
 
 class ShopView(TemplateView):
     template_name = "shop.html"
-    permission_denied_message = 'You have to be logged in to access that page'
     login_url = '/login/'
     def get_context_data(self, **kwargs):
         if not Session.objects.filter(session_key=self.request.session.session_key).exists():
