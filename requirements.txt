@@ -20,3 +20,4 @@ uvicorn
 djangorestframework
 channels["daphne"]
 django-rest-live
+django-rest-knox
