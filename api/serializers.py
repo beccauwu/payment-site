@@ -1,11 +1,12 @@
 import email
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from payments.models import Order, Product, Price
 from messaging.models import Message
-from accounts.models import Profile
+from accounts.models import Profile, CookieConsent
 from general import stripe_stuff as stripe
+from django.contrib.auth.hashers import make_password
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,28 +45,47 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         print(f"validated_data: {validated_data}")
-        profile_data = validated_data['profile']
+        profile_data = validated_data.pop('profile')
+        print(f"profile_data: {profile_data}")
         email = validated_data.pop('email')
         full_name = profile_data.pop('full_name')
         username = validated_data.pop('username')
-        password = validated_data.pop('password')
+        password = make_password(validated_data.pop('password'))
         address = profile_data.pop('address')
         postcode = profile_data.pop('postcode')
         city = profile_data.pop('city')
         country = profile_data.pop('country')
-        customer = stripe.create_customer(email, full_name)
-        user = User.objects.create(
+        customer = stripe.get_customer_by_email(email)
+        if customer is None:
+            customer = stripe.create_customer(
+                email,
+                full_name,
+                {"line1": address, "postal_code": postcode, "city": city, "country": country})
+        try:
+            user = User.objects.get(email=email)
+            return user
+        except User.DoesNotExist:
+            user = User.objects.create(
                 username=username,
                 email=email,
                 password=password)
-        user.save()
-        profile = Profile.objects.create(
-            user = user,
-            full_name = full_name,
-            address = address,
-            postcode = postcode,
-            city = city,
-            country = country,
-            stripe_customer_id = customer.id)
-        profile.save()
-        return user
+            profile = Profile.objects.create(
+                user=user,
+                full_name=full_name,
+                address=address,
+                postcode=postcode,
+                city=city,
+                country=country,
+                stripe_customer_id=customer.id)
+            profile.save()
+            return user
+
+class CookieUnauthSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CookieConsent
+        fields = ('consent', 'session')
+
+class CookieAuthSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CookieConsent
+        fields = ('consent', 'user')
