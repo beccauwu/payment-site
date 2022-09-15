@@ -15,12 +15,21 @@ def create_session(itms, customer=None):
             cancel_url=settings.BASE_URL + '/purchases/cancel/',
         )
 
-def create_customer(email, name, tax=None):
+def create_customer(email, full_name, address, tax=None):
     return stripe.Customer.create(
         email=email,
-        name=name,
+        name=full_name,
+        address=address,
         tax_exempt=tax
     )
+
+def get_customer_by_email(email=None):
+    customer_list = stripe.Customer.list(email=email, limit=1)
+    try:
+        customer = customer_list['data'][0]
+        return customer
+    except IndexError:
+        return None
 
 def retrieve_customer(id):
     return stripe.Customer.retrieve(id)
@@ -33,6 +42,13 @@ def create_payment_intent(amount, currency, customer=None):
         payment_method_types=['card'],
     )
     print(intent)
+    return intent
+
+def retrieve_payment_intent(id):
+    return stripe.PaymentIntent.retrieve(id)
+
+def update_payment_intent(intent, update: dict):
+    intent.update(update)
     return intent
 
 # def get_prods():
