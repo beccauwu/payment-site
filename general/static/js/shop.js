@@ -1,5 +1,4 @@
-const prodAPI = "http://127.0.0.1:8000/api/products/";
-const basketAPI = "http://127.0.0.1:8000/api/basket/";
+
 const prodhtml = (img, name, id, q, s) => {
   return `
 <div class="product col rounded bg-light wi-fc text-center">
@@ -28,34 +27,32 @@ const prodhtml = (img, name, id, q, s) => {
 };
 let basket;
 const get_quantity = (id) => {
-  if (basket) {
-    return basket[id].quantity;
-  }
-  return 0;
+  return basketData[id].quantity;
 };
 let allprods;
 function get() {
-  $.getJSON(prodAPI, function (results) {
-    console.log(results);
-    $.each(results, function (index) {
-        const id = results[index].id;
-        let quantity = get_quantity(results[index].id);
-        console.log(`quantity: ${quantity}`);
-        let prod = prodhtml(
-            results[index].img,
-            results[index].prod_name,
-            id,
-            quantity,
-            String(quantity).length
-        );
-        if (allprods == null) {
-            allprods = prod;
-        } else {
-            allprods += prod;
-        }
-        $("#products").html(allprods);
-        });
-    });
+  if (productData == null || basketData == null) {
+    setTimeout(get, 100);
+    return;
+  }
+  $.each(productData, function (index) {
+    const id = productData[index].id;
+    let quantity = get_quantity(id);
+    console.log(`quantity: ${quantity}`);
+    let prod = prodhtml(
+      productData[index].img,
+      productData[index].prod_name,
+      id,
+      quantity,
+      String(quantity).length
+    );
+    if (allprods == null) {
+      allprods = prod;
+    } else {
+      allprods += prod;
+    }
+    $("#products").html(allprods);
+  });
 }
 function addBasket(id) {
   $.ajax({
