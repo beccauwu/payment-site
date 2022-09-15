@@ -14,19 +14,22 @@
                 <h2 class="accordion-header">
                     <button class="accordion-button giBold" type="button"
                         data-bs-toggle="collapse" data-bs-target="#basketContents"
-                        aria-expanded="true" aria-controls="basketContents">Basket - step 1/3</button>
+                        aria-expanded="true" aria-controls="basketContents" id="basketInfoBtn">Basket - step 1/3</button>
                 </h2>
                 <div id="basketContents" class="accordion-collapse collapse show">
                     <div class="accordion-body">
                         <div class="row" id="basketItems">
 
                         </div>
-                        <div class="row">
-                            <div class="col-6">
+                        <div class="row mt-2">
+                            <div class="col-3">
                                 <p class="giBold">Total:</p>
                             </div>
-                            <div class="col-6">
+                            <div class="col-3">
                                 <p class="giBold" id="basketTotal"></p>
+                            </div>
+                            <div class="col-6">
+                                <button class="btn btn-primary giBold d-block float-end" id="next-1" onclick="clickDetails()">Next <i class="ms-2 fa-solid fa-arrow-right"></i></button>
                             </div>
                         </div>
                     </div>
@@ -35,7 +38,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header" id="customerInfoHeader">
                     <button class="accordion-button giBold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#customerInfo"
-                        aria-expanded="true" aria-controls="customerInfo">Your details - step 2/3</button>
+                        aria-expanded="true" aria-controls="customerInfo" id="detailsBtn">Your details - step 2/3</button>
                 </h2>
                 <div id="customerInfo" class="accordion-collapse collapse" aria-labelledby="customerInfoHeader">
                     <div class="accordion-body" id="customerInfo">
@@ -79,7 +82,12 @@
                                 <!-- Display error message to your customers here -->
                             </div>
                             {% endif %}
-                            <button type="button" class="btn btn-primary" onclick="stripeCheckoutBtn()">Next<i class="fa-solid fa-circle-right"></i></button>
+                            <div class="row">
+                                <div class="col-12">
+                                    <button id="stripeCheckoutNext" type="button" class="btn btn-primary giBold mt-2"
+                                        onclick="stripeCheckoutNoAccount()">Next <i class="ms-2 fa-solid fa-arrow-right"></i></button>
+                                </div>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -87,7 +95,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header" id="stripeHeader">
                     <button class="accordion-button giBold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#stripeCheckout"
-                        aria-expanded="true" aria-controls="stripeCheckout" disabled>Payment info - step 3/3</button>
+                        aria-expanded="true" aria-controls="stripeCheckout" id="stripeCheckoutBtn" disabled>Payment info - step 3/3</button>
                 </h2>
                 <div id="stripeCheckout" class="accordion-collapse collapse" aria-labelledby="stripeHeader">
                     <div class="accordion-body" id="basketItems">
