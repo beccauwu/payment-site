@@ -27,7 +27,7 @@ const editBasketHtml = (id) => {
 };
 let registrationHtml = `
 <div class="row">
-  <div class="col-12 userRegisterInputs">
+  <div class="col-12 userRegisterInputs" id="userInfoUsernameContainer">
     <label class="form-label" for="userInfoUsername">Username:</label>
     <input class="form-control" type="text" id="userInfoUsername" name="userInfoUsername" autocomplete="off" required>
   </div>
@@ -35,14 +35,28 @@ let registrationHtml = `
     <label class="form-label" for="userInfoPassword">Password:</label>
     <input class="form-control" type="password" id="userInfoPassword" name="userInfoPassword" autocomplete="off" required>
   </div>
-  <div class="col-md-6 col-sm-12 userRegisterInputs">
+  <div class="col-md-6 col-sm-12 userRegisterInputs" id="userInfoPwd2Container">
     <label class="form-label" for="userInfoPassword2">Confirm Password:</label>
     <input class="form-control" type="password" id="userInfoPassword2" name="userInfoPassword2" autocomplete="off" required>
   </div>
+  <div class="col-12">
+    <button onclick="hasAccountToggle()" class="btn btn-primary mt-2 wi-fc mx-auto">Already have an account?</button>
+  </div>
 </div>
-`
+`;
+const username = document.getElementById("userInfoUsername");
+const password = document.getElementById("userInfoPassword");
+const password2 = document.getElementById("userInfoPassword2");
+const full_name = document.getElementById("userInfoName");
+const email = document.getElementById("userInfoEmail");
+const address = document.getElementById("userInfoAddress");
+const city = document.getElementById("userInfoCity");
+const country = document.getElementById("niceCountryInputMenuInputHidden");
+const postcode = document.getElementById("userInfoPostcode");
+
 let checkoutBasketHTML;
 let client_secret;
+let createuser = false;
 function stripeThings(){
     if (client_secret == null) {
         setTimeout(stripeThings, 1000);
@@ -105,7 +119,7 @@ function stripeThings(){
 }
 function secret (){
   $.ajax({
-    url: "http://127.0.0.1:8000/api/checkout/",
+    url: "http://127.0.0.1:8000/api/shop/checkout/",
     type: "GET",
     dataType: "json",
     success: function (data) {
@@ -146,18 +160,145 @@ function basketItems() {
   });
 }
 
-function stripe_main(){
-    secret();
-    basketItems();
-    stripeThings();
+function stripePaymentIntentUpdate(){
+    $.ajax({
+        url: "http://127.0.0.1:8000/api/shop/checkout/update/",
+        type: "GET",
+        dataType: "json",
+        success: function (data) {
+            console.log(`secret: ${data["client_secret"]}`);
+            client_secret = data["client_secret"];
+            $('#spinner').remove();
+        },
+    });
+    return
+}
+
+function stripeCustomerGetOrCreate(){
+  $.ajax({
+    url: "http://127.0.0.1:8000/api/shop/checkout/",
+    type: "POST",
+    dataType: "json",
+    headers: { "X-CSRFToken": csrftoken },
+    data: {
+      email: email.value,
+      full_name: full_name.value,
+      address: {
+        line1: address.value,
+        city: city.value,
+        country: country.value,
+        postal_code: postcode.value,
+      }
+    },
+    success: function (data) {
+      console.log(data);
+      stripePaymentIntentUpdate();
+    },
+  });
+  return
+}
+
+function userCreate(){
+  $.ajax({
+    url: "http://127.0.0.1/api/auth/users/",
+    type: "POST",
+    dataType: "json",
+    headers: { "X-CSRFToken": csrftoken },
+    data: {
+      username: username.value,
+      password: password.value,
+      password2: password2.value,
+      email: email.value,
+      profile: {
+        full_name: full_name.value,
+        address: address.value,
+        city: city.value,
+        country: country.value,
+        postal_code: postcode.value,
+      },
+    },
+    success: function (data) {
+      console.log(data);
+      stripePaymentIntentUpdate();
+    },
+  });
+}
+
+function userLogin(){
+  $.ajax({
+    url: "http://127.0.0.1:8000/api/auth/login/",
+    type: "POST",
+    dataType: "json",
+    headers: { "X-CSRFToken": csrftoken },
+    data: {
+      username: username.value,
+      password: password.value,
+    },
+    success: function (data) {
+      console.log(data);
+      stripePaymentIntentUpdate();
+    },
+  });
+}
+
+function clickDetails() {
+  $("#detailsBtn").click();
+  $('#basketInfoBtn').click()
+}
+
+function stripeCheckoutNoAccount() {
+  if ($("#stripeCheckoutNext").children("#spinner").length == 0){
+    $('#stripeCheckoutNext').prepend(spinner)
+    stripeCustomerGetOrCreate();
+    $("#stripeCheckoutNext").children("#spinner").remove();
+    $("#stripeCheckoutBtn").prop("disabled", false).click();
+    $('#detailsBtn').click();
+  }
+}
+
+function stripeCheckoutLogin() {
+  if ($("#stripeCheckoutNext").children("#spinner").length == 0){
+    $('#stripeCheckoutNext').prepend(spinner)
+    userLogin();
+    $("#stripeCheckoutNext").children("#spinner").remove();
+    $("#stripeCheckoutBtn").prop("disabled", false).click();
+    $('#detailsBtn').click();
+  }
+}
+
+function stripeCheckoutCreateAccount(){
+  if ($("#stripeCheckoutNext").children("#spinner").length == 0){
+    $('#stripeCheckoutNext').prepend(spinner)
+    userCreate();
+    $("#stripeCheckoutNext").children("#spinner").remove();
+    $("#stripeCheckoutBtn").prop("disabled", false).click();
+  }
 }
 
 function toggleUserForm() {
   if ($("#createAccountSwitch").is(":checked")) {
     $("#userInfo").append(registrationHtml);
+    $('#stripeCheckoutNext').attr('onclick', 'stripeCheckoutCreateAccount()');
   } else {
     $(".userRegisterInputs").remove();
+    $('#stripeCheckoutNext').attr('onclick', 'stripeCheckoutNoAccount()');
   }
+}
+
+function hasAccountToggle(){
+  if ($("#userInfoUsernameContainer").hasClass('col-md-6')){
+    $("#userInfoUsernameContainer").removeClass('col-md-6');
+    $('#stripeCheckoutNext').attr('onclick', 'stripeCheckoutLogin()');
+  } else {
+    $("#userInfoUsernameContainer").addClass('col-md-6');
+    $("#stripeCheckoutNext").attr("onclick", "stripeCheckoutCreateAccount()");
+  }
+}
+
+function stripe_main() {
+  secret();
+  basketItems();
+  stripeThings();
 }
 
 stripe_main();
