@@ -6,7 +6,7 @@ from django.contrib.auth import login
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.views import LoginView as KnoxLoginView
 from knox.models import AuthToken
-from accounts.models import CookieConsent
+from accounts.models import CookieConsent, TempSession
 from .. import serializers
 
 class UserAPIView(generics.GenericAPIView):
@@ -76,5 +76,20 @@ class LoginAPIView(KnoxLoginView):
         serializer = AuthTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
+        session_data = Session.objects.get(pk=request.session.session_key).get_decoded()
+        TempSession.objects.create(username=user.username, session_data=session_data)
         login(request, user)
         return super(LoginAPIView, self).post(request, format=None)
+
+class RestoreSessionAPIView(APIView):
+    def get(self, request):
+        if TempSession.objects.filter(username=request.data['username']).exists():
+            tempsession = TempSession.objects.get(username=request.data['username'])
+            session_data = tempsession.session_data
+            if not Session.objects.filter(pk=request.session.session_key).exists():
+                request.session.create()
+            request.session = session_data
+            tempsession.delete()
+            return Response({'authenticated': 'true'})
+        else:
+            return Response({'authenticated': 'false'})
