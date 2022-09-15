@@ -80,7 +80,7 @@
             <div class="shopping-basket-total mt-3 ms-2 fs-5">
                 <span class="lighter-text giBold">Total:</span>
                 <span class="main-color-text" id="basket-total"></span>
-                <button class="btn btn-primary btn-sm d-inline float-end me-2">Checkout</button>
+                <a href="{% url 'checkout' %}" class="btn btn-primary btn-sm d-inline float-end me-2">Checkout</a>
             </div>
         </div>
     </div>
@@ -117,7 +117,7 @@
 <script src="{% static 'js/main.js' %}"></script>
 <script src="{% static 'js/shop.js' %}"></script>
 <script>
-    const spinner = `<img src="{% static 'img/spinner.svg' %}" alt="spinner" />`
+    const spinner = `<span class="spinner-border spinner-border-sm" id="spinner"><span>`;
 </script>
 {% block scripts %}
 {% endblock %}
