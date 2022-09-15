@@ -2,6 +2,7 @@ from datetime import datetime
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import permissions
+from accounts.models import Profile
 from payments.models import Product, Price, Order
 from django.contrib.sessions.models import Session
 from django.http import Http404
@@ -127,13 +128,47 @@ class SessionAPI(APIView):
         return Response('success')
 
 class CheckoutAPI(APIView):
+    def post(self, request):
+        email = request.data['email']
+        full_name = request.data['full_name']
+        address = request.data['address']
+        customer = stripe.get_customer_by_email(email)
+        if not customer:
+            customer = stripe.create_customer(email, full_name, address)
+        request.session['userdata'] = {
+            'email': email,
+            'full_name': full_name,
+            'address': address,
+            'customer_id': customer['id'],
+            }
+        print(request.session['userdata'])
+        return Response({'success': 'true'})
     def get(self, request):
         basket = Basket(request)
         currency = 'eur'
-        customer = None
-        intent = stripe.create_payment_intent(basket.get_total_price(), currency, customer)
+        userdata = request.session['userdata']
+        if 'userdata' not in request.session.keys():
+            request.session['userdata'] = {}
+        elif 'payment_intent_id' in userdata.keys():
+            intent = stripe.retrieve_payment_intent(userdata['payment_intent_id'])
+            print(f"clicent secret: {intent.client_secret}")
+            return Response({'client_secret': intent.client_secret})
+        intent = stripe.create_payment_intent(basket.get_total_price(), currency)
+        request.session['userdata']['payment_intent_id'] = intent.id
+        print(f"session: {request.session['userdata']}")
         print(f"clicent secret: {intent.client_secret}")
         return Response({'client_secret': intent.client_secret})
+
+class PaymentIntentUpdate(APIView):
+    def get(self, request):
+        basket = Basket(request)
+        userdata = request.session['userdata']
+        intent_id = userdata['payment_intent_id']
+        intent = stripe.retrieve_payment_intent(intent_id)
+        update = {'customer': userdata['customer_id'], 'amount': basket.get_total_price()}
+        intent = stripe.update_payment_intent(intent, update)
+        print(f"updated: {intent.client_secret}")
+        return Response({'success': 'true'})
 
 class GetProductsAPI(APIView):
     def get(self, request):
