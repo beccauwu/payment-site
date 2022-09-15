@@ -31,22 +31,6 @@ const passwordNomatch = `
 
 let userData;
 
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== "") {
-    let cookies = document.cookie.split(";");
-    for (let i = 0; i < cookies.length; i++) {
-      let cookie = jQuery.trim(cookies[i]);
-      // Does this cookie string begin with the name we want?
-      if (cookie.substring(0, name.length + 1) === name + "=") {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-}
-let csrftoken = getCookie("csrftoken");
 
 function create_user() {
   const username = document.getElementById("createuser-username").value;
@@ -67,7 +51,7 @@ function create_user() {
   };
   $.ajax({
     type: "POST",
-    url: "http://127.0.0.1:800/api/users/",
+    url: "http://127.0.0.1:800/api/auth/users/",
     data: JSON.stringify(data),
     headers: { "X-CSRFToken": csrftoken },
     contentType: "application/json",
@@ -94,7 +78,7 @@ $("#createAccountSwitch").on("change", function () {
 function getUserData() {
   $.ajax({
     type: "GET",
-    url: "http://127.0.0.1:800/api/users/",
+    url: "http://127.0.0.1:800/api/auth/users/",
     dataType: "json",
     success: function (data) {
       userData = data;
@@ -109,4 +93,19 @@ function getUserData() {
       }
     },
   });
+}
+function isAuthenticated() {
+  let authenticated = false;
+  $.ajax({
+    type: "GET",
+    url: "http://127.0.0.1:8000/api/auth/status/",
+    dataType: "json",
+    success: function (data) {
+      console.log(`Authenticated: ${data.auth}`);
+      if (data.auth == true) {
+        authenticated = true;
+      }
+    },
+  });
+  return authenticated;
 }
