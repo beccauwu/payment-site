@@ -1,12 +1,13 @@
 
-const prodhtml = (img, name, id, q, s) => {
+const prodhtml = (img, name, id, q, s, p) => {
   return `
-<div class="product col rounded bg-light wi-fc text-center">
+<div class="product col-lg-3 col-md-4 col-sm-6 rounded bg-light wi-fc mx-3 text-center">
     <div class="description mx-auto" style="width:100px;">
         <img class="d-block mx-auto rounded-circle" src="${img}" alt="product image" width="100">
     </div>
     <div class="text-center">
         <p class="d-inline giBold">${name}</p>
+        <p class="d-inline text-muted">€${p}</p>
     </div>
     <div class="input-group wi-fc mx-auto">
         <span class="input-group-btn">
@@ -26,9 +27,7 @@ const prodhtml = (img, name, id, q, s) => {
 `;
 };
 let basket;
-const get_quantity = (id) => {
-  return basketData[id].quantity;
-};
+
 let allprods;
 function get() {
   if (productData == null || basketData == null) {
@@ -44,7 +43,8 @@ function get() {
       productData[index].prod_name,
       id,
       quantity,
-      String(quantity).length
+      String(quantity).length,
+      productData[index].price
     );
     if (allprods == null) {
       allprods = prod;

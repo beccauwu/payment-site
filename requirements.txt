@@ -1,6 +1,6 @@
 amqp
 asgiref
-billiard
+billiard==3.6.4.0
 celery
 certifi
 charset-normalizer
@@ -18,7 +18,5 @@ gunicorn
 psycopg2-binary
 uvicorn
 djangorestframework
-channels["daphne"]
-django-rest-live
 django-rest-knox
 jsonfield

@@ -1,5 +1,11 @@
 const prodAPI = "http://127.0.0.1:8000/api/shop/products/";
 const basketAPI = "http://127.0.0.1:8000/api/shop/basket/";
+const get_quantity = (id) => {
+  if (basketData[id] == null) {
+    return 0;
+  }
+  return basketData[id].quantity;
+};
 function getCookie(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== "") {
@@ -126,6 +132,16 @@ function update_basket() {
     setTimeout(update_basket, 100);
     return;
   }
+  if (Object.keys(basketData).length == 0) {
+    basketHTML = `
+    <div class="dropdown-item text-center">
+      <span class="text-muted">Your basket is empty</span>
+    </div>
+    `;
+    $("#basket-items").html(basketHTML);
+    $("#basket-total").text(`€0.00`);
+    return;
+  }
   $(".badge").text(Object.keys(basketData).length);
   let total = 0;
   Object.keys(productData).forEach(function (key) {
@@ -134,8 +150,8 @@ function update_basket() {
     const basketItm = basketData[id];
     const img = product.img;
     const name = product.prod_name;
-    const price = basketItm.price;
-    const quantity = basketItm.quantity;
+    const price = product.price;
+    const quantity = get_quantity(id);
     if (basketData.hasOwnProperty(id)) {
       let prod = basketDropdownHTML(img, name, id, quantity, price);
       if (basketHTML == null) {
@@ -153,6 +169,5 @@ function m() {
   getBasket();
   getProducts();
   update_basket();
-  console.log(csrftoken);
 }
 m();

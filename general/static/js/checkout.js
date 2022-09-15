@@ -142,8 +142,8 @@ function basketItems() {
     const basketItm = basketData[id];
     const img = product.img;
     const name = product.prod_name;
-    const price = basketItm.price
-    const quantity = basketItm.quantity;
+    const price = product.price
+    const quantity = get_quantity(id);
     if (basketData.hasOwnProperty(id)) {
       let prod = basketCheckoutHTML(img, name, id, quantity, price);
       if (checkoutBasketHTML == null) {
@@ -168,7 +168,6 @@ function stripePaymentIntentUpdate(){
         success: function (data) {
             console.log(`secret: ${data["client_secret"]}`);
             client_secret = data["client_secret"];
-            $('#spinner').remove();
         },
     });
     return

@@ -22,24 +22,24 @@ class HomeView(TemplateView):
 
 class ShopView(TemplateView):
     template_name = "shop.html"
-    login_url = '/login/'
-    def get_context_data(self, **kwargs):
-        if not Session.objects.filter(session_key=self.request.session.session_key).exists():
-            self.request.session.create()
-            print(f'session created: {self.request.session.session_key}')
-        if not 'products' in self.request.session:
-            self.request.session['products'] = get_prods()
-        products = self.request.session['products']
-        some_dict = {}
-        for key, vals in self.request.session.items():
-            num = 0
-            for val in vals:
-                some_dict[f'{key}{num}'] = val
-                num += 1
-        pprint(some_dict)
-        context = super(ShopView, self).get_context_data(**kwargs)
-        context.update({'products': products, 'nav_shop': 'active'})
-        return context
+    # login_url = '/login/'
+    # def get_context_data(self, **kwargs):
+    #     if not Session.objects.filter(session_key=self.request.session.session_key).exists():
+    #         self.request.session.create()
+    #         print(f'session created: {self.request.session.session_key}')
+    #     if not 'products' in self.request.session:
+    #         self.request.session['products'] = get_prods()
+    #     products = self.request.session['products']
+    #     some_dict = {}
+    #     for key, vals in self.request.session.items():
+    #         num = 0
+    #         for val in vals:
+    #             some_dict[f'{key}{num}'] = val
+    #             num += 1
+    #     pprint(some_dict)
+    #     context = super(ShopView, self).get_context_data(**kwargs)
+    #     context.update({'products': products, 'nav_shop': 'active'})
+    #     return context
 
 class BasketView(TemplateView):
     template_name = "basket.html"

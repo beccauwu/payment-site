@@ -32,7 +32,6 @@ CSRF_TRUSTED_ORIGINS = config('DJANGO_TRUSTED_ORIGINS', default='http://127.0.0.
 # Application definition
 
 INSTALLED_APPS = [
-    "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,7 +41,6 @@ INSTALLED_APPS = [
     'django_extensions',
     'rest_framework',
     'knox',
-    'rest_live',
     'payments',
     'general',
     'accounts',

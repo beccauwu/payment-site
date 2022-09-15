@@ -15,11 +15,14 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     img = serializers.SerializerMethodField('get_img_url')
+    price = serializers.SerializerMethodField('get_price')
     def get_img_url(self, obj):
         return obj.get_image()
+    def get_price(self, obj):
+        return Price.objects.get(product=obj).price
     class Meta:
         model = Product
-        fields = ['id', 'prod_name', 'img']
+        fields = ['id', 'prod_name', 'img', 'price']
 
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
