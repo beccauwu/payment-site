@@ -1,7 +1,12 @@
 from django.db import models
 from datetime import datetime, timedelta
+from jsonfield import JSONField
 
 # Create your models here.
+
+class TempSession(models.Model):
+    username = models.CharField(max_length=100)
+    session_data = JSONField()
 
 class Profile(models.Model):
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE)
