@@ -7,3 +7,7 @@
 */migrations/__pycache__
 /static
 /notebooks
+/node_modules
+package-lock.json
+package.json
+app.js
