@@ -20,23 +20,33 @@ class Basket:
             basket = self.session[BASKET_SESSION_ID] = {}
         self.basket = basket
     def __iter__(self):
-        print('iter accessed')
+        if not self.basket.keys():
+            return []
         product_ids = self.basket.keys()
         products = Product.objects.filter(id__in=product_ids)
         for product in products:
-            self.basket[str(product.id)]['product'] = product
-        for item in self.basket.values():
-            item['price_id'] = Price.objects.get(product=item['product']).stripe_price_id
-            item['price'] = float(item['price'])
-            item['total_price'] = item['price'] * item['quantity']
-            yield item
+            products_list = {
+                'id': product.id,
+                'prod_name': product.prod_name,
+                'price': product.price.price,
+                'img': product.get_image(),
+                'description': product.get_description(),
+                'quantity': self.basket[str(product.id)]['quantity'],
+                }
+            yield products_list
     def add(self, product, quantity=1, update_quantity=False):
         product_id = str(product.id)
         price = Price.objects.get(product=product)
-        if product_id not in self.basket:
-            self.basket[product_id] = {'quantity': 0, 'price': str(price.price)}
-        if update_quantity:
-            self.basket[product_id]['quantity'] = quantity
+        if product_id not in self.basket and not update_quantity:
+            self.basket[product_id] = {'quantity': 1, 'price': str(price.price)}
+        elif update_quantity:
+            print(f"quantity: {quantity}")
+            if not quantity <= 0 and product_id in self.basket:
+                self.basket[product_id]['quantity'] = quantity
+            elif quantity == 0:
+                self.clear(product)
+            elif product_id not in self.basket:
+                self.basket[product_id] = {'quantity': quantity, 'price': str(price.price)}
         else:
             self.basket[product_id]['quantity'] += quantity
         print(self.basket)
@@ -45,6 +55,10 @@ class Basket:
         product_id = str(product.id)
         if product_id in self.basket:
             self.basket[product_id]['quantity'] -= 1
+        if not product_id in self.basket:
+            return
+        if self.basket[product_id]['quantity'] <= 0:
+            self.clear(product)
         print(self.basket)
         self.save()
     def save(self):
@@ -72,12 +86,19 @@ class Basket:
         session = stripe.create_session(line_itms)
         return session
 
+class BasketViewSet(ModelViewSet):
+    serializer_class = ProductSerializer
+    def get_queryset(self):
+        basket = Basket(self.request)
+        product_ids = basket.basket.keys()
+        return Product.objects.filter(id__in=product_ids)
 
 class BasketAPI(APIView):
 
     def get(self, request):
         basket = Basket(request)
-        return Response(basket.basket)
+        print(f'basket: {list(basket)}')
+        return Response(list(basket))
 
     def post(self, request, pk):
         basket = Basket(request)
@@ -129,9 +150,20 @@ class SessionAPI(APIView):
 
 class CheckoutAPI(APIView):
     def post(self, request):
+        if 'set_id' in request.data:
+            print('set client secret')
+            request.session['payment_intent_id'] = request.data['payment_intent_id']
+            pprint(f"userdata: {request.session.keys()}")
+            return Response({'success': 'true'})
+        print('checkout post')
         email = request.data['email']
         full_name = request.data['full_name']
-        address = request.data['address']
+        address = dict(
+            line1=request.data['line1'],
+            city=request.data['city'],
+            postal_code=request.data['postal_code'],
+            country=request.data['country']
+            )
         customer = stripe.get_customer_by_email(email)
         if not customer:
             customer = stripe.create_customer(email, full_name, address)
