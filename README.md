@@ -1,6 +1,5 @@
-# payment-site
+# Payment Site
 
-## Links
-* [Deployable repo](https://github.com/beccauwu/payment-site-docker)
-* [Deploy script](https://github.com/beccauwu/django-dockerise)
-* [Live site](https://shopsite.perttula.co)
+## 1\. Introduction
+
+The site is a demo for a Django Rest Framework-backend, ReactJs-frontend e-commerce website.
