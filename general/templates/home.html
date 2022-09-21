@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Home{% endblock %}
-{% block content %}
-<h1 class="text-black">{{ request.user.username }}</h1>
+{% block scripts %}
+<script src="{% static 'js/home.jsx' %}" type="text/babel"></script>
 {% endblock %}
