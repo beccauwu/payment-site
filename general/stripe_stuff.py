@@ -27,8 +27,10 @@ def get_customer_by_email(email=None):
     customer_list = stripe.Customer.list(email=email, limit=1)
     try:
         customer = customer_list['data'][0]
+        print(f'Customer {customer.id} found')
         return customer
     except IndexError:
+        print('No customer found')
         return None
 
 def retrieve_customer(id):
@@ -47,9 +49,16 @@ def create_payment_intent(amount, currency, customer=None):
 def retrieve_payment_intent(id):
     return stripe.PaymentIntent.retrieve(id)
 
-def update_payment_intent(intent, update: dict):
-    intent.update(update)
+def update_payment_intent(id, customer, amount):
+    intent = stripe.PaymentIntent.modify(
+        id,
+        amount=amount,
+        customer=customer
+    )
     return intent
+
+def get_description(id):
+    return stripe.Product.retrieve(id)['description']
 
 # def get_prods():
 #     response = stripe.Product.list(limit=3)
