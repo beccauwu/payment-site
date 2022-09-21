@@ -1,5 +1,14 @@
+import random
+import string
 from django.contrib import messages
 from django.shortcuts import redirect
+from payments.models import Order
+
+def random_order_id():
+    oid = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+    if Order.objects.filter(order_id=oid).exists():
+        random_order_id()
+    return oid
 
 def referrer_redirect(request):
     return redirect(request.META.get('HTTP_REFERER'))
