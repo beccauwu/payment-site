@@ -1,0 +1,133 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="shop, cool, products">
+    <meta name="description" content="a place to buy cool products">
+    <link rel="stylesheet" href="{% static 'css/main.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+        integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.0/js/bootstrap.bundle.min.js"
+        integrity="sha512-9GacT4119eY3AcosfWtHMsT5JyZudrexyEVzTBWV3viP/YfB9e2pEy3N7WXL3SV6ASXpTU0vzzSxsbfsuUH4sQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react-bootstrap@next/dist/react-bootstrap.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    {% block head %}
+    {% endblock %}
+    <title>{% block title %}{% endblock %} - perttula.co</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <!-- Nav tabs -->
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="fa-solid fa-bars"></span>
+            </button>
+            <div class="collapse navbar-collapse show" id="navbarNavDropdown">
+                <ul class="nav" id="mainNav">
+                    <li class="nav-item">
+                        <a href="{% url 'home' %}" class="nav-link {{ nav_home }}" aria-current="page">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'shop' %}" class="nav-link {{ nav_shop }}">Shop</a>
+                    </li>
+                    {% if request.user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Account
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Your Orders</a></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="modal" data-bs-target="#loginModal"
+                                    aria-label="log in to your account">Login</a>
+                    </li>
+                    {% endif %}
+                </ul>
+
+            </div>
+            <span class="float-lg-end">
+                <a href="#offCanvas" id="basket" class="btn btn-sm"
+                    data-bs-toggle="offcanvas" data-bs-target="#offCanvas" role="button" aria-controls="offCanvas">
+                    <i class="fa-solid fa-basket-shopping"></i> Basket<span class="badge"></span>
+                </a>
+            </span>
+        </div>
+        <!-- Tab panes -->
+    </nav>
+    <!--end container -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offCanvas" aria-labelledby="offCanvasLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title giBold" id="offCanvasLabel">Basket</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="shopping-basket">
+            <div class="shopping-basket-items" id="basket-items">
+            </div>
+            <div class="shopping-basket-total mt-3 ms-2 fs-5">
+                <span class="lighter-text giBold">Total:</span>
+                <span class="main-color-text" id="basket-total"></span>
+                <a href="{% url 'checkout' %}" class="btn btn-primary btn-sm d-inline float-end me-2">Checkout</a>
+            </div>
+        </div>
+    </div>
+</div>
+<main class="container-fluid">
+{% if alert %}
+<div class="d-flex alert alert-{{ alert.type }} fade show alert-dismissible text-center wi-fc mx-auto mt-2 ps-5"
+    role="alert">
+    <p class="mt-3 giBold">{{ alert.message }}</p>
+    <button type="button"
+        class="btn btn-outline-primary fs-5 border-0 fa-solid fa-xmark ms-3 float-end align-self-center"
+        data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+{% endif %}
+{% if messages %}
+{% for message in messages %}
+<div class="d-flex alert alert-{{ message.tags }} fade show alert-dismissible text-center wi-fc mx-auto mt-2 ps-5"
+    role="alert">
+    <p class="mt-3">{{ message }}</p>
+    <button type="button"
+        class="btn btn-outline-primary fs-5 border-0 fa-solid fa-xmark ms-3 float-end align-self-center"
+        data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% block content %}
+{% endblock %}
+</main>
+{% if not request.user.is_authenticated %}
+{% include 'auth/modals.html' %}
+<input id="authCheck" type="hidden" value="true" readonly>
+{% else %}
+<input id="authCheck" type="hidden" value="false" readonly>
+{% endif %}
+<script src="https://kit.fontawesome.com/cd478b5352.js" crossorigin="anonymous"></script>
+<!-- <script src="{% static 'js/main.js' %}"></script> -->
+<script src="{% static 'js/main.jsx' %}" type="text/babel"></script>
+<script>
+    const spinner = `<span class="spinner-border spinner-border-sm" id="spinner"><span>`;
+    const auth = document.getElementById('authCheck').value;
+</script>
+{% block scripts %}
+{% endblock %}
+</body>
+</html>

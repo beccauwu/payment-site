@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ object.name }}{% endblock %}
+{% block head %}
+<script src="{% static 'star-rating-svg/jquery.star-rating-svg.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'star-rating-svg/star-rating-svg.css' %}">
+<script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+{% endblock %}
+{% block content %}
+
+<div class="row d-flex justify-content-center">
+    <div class="col-md-4 col-12 d-flex d-md-block justify-content-center">
+        <img src="{{object.get_image}}" alt="" class="rounded-circle float-md-end float-sm-none">
+    </div>
+    <div class="col-md-4 col-12 align-self-md-center d-flex flex-column align-items-center">
+        <div class="text-center">
+            <h3 class="giBold">{{object.prod_name}}</h3>
+            <p>{{object.price.price}}<br>{{object.get_description}}</p>
+        </div>
+        <div class="row text-center wi-fc">
+            <div class="col-4">
+                <input type="text" class="form-control" size="1" value="1" id="basket-input" onchange="setBasket()">
+            </div>
+            <div class="col-8 mt-1">
+                <button class="btn btn-primary btn-sm" onclick="setBasket()">Add to basket</button>
+            </div>
+            <input type="hidden" value="{{object.id}}" id="objectId">
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6 col-sm-12 offset-md-3">
+        {% if object.reviews %}
+        {% for review in object.reviews.all %}
+        <div class="text-center row">
+            <div class="col-3">
+                <p>{{review.user.username}}</p>
+                <p class="text-muted">{{review.uploaded}}</p>
+                <div id="stars">
+                    <input type="hidden" value="{{review.stars}}" id="starCount-{{review.id}}">
+                </div>
+            </div>
+            <div class="col-9">
+                <h3>{{review.title}}</h3>
+                <p>{{review.comment}}</p>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+    <div class="review-form col-md-6 col-sm-12 offset-md-3 mt-4">
+        <div id="reviewStars" class="text-center mb-2 fs-4">
+            <i class="fa-solid fa-star star-1 star-2 star-3 star-4 star-5 text-secondary" id="star-1" onclick="setStar(1)"></i><i
+                class="fa-solid fa-star star-2 star-3 star-4 star-5 text-secondary" id="star-2" onclick="setStar(2)"></i><i
+                class="fa-solid fa-star star-3 star-4 star-5 text-secondary" id="star-3" onclick="setStar(3)"></i><i class="fa-solid fa-star star-4 star-5 text-secondary"
+                id="star-4" onclick="setStar(4)"></i><i class="fa-solid fa-star star-5 text-secondary" id="star-5" onclick="setStar(5)"></i>
+        </div>
+        <textarea name="" id="" cols="30" rows="10" class="form-control"></textarea>
+        <input type="hidden" id="starCount" value="0">
+        <button class="d-block btn btn-primary my-2 wi-fc mx-auto" onclick="submitReview">Submit</button>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/prod.js' %}"></script>
+{% endblock %}
