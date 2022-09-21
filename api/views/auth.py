@@ -76,8 +76,9 @@ class LoginAPIView(KnoxLoginView):
         serializer = AuthTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
-        session_data = Session.objects.get(pk=request.session.session_key).get_decoded()
-        TempSession.objects.create(username=user.username, session_data=session_data)
+        if Session.objects.filter(pk=request.session.session_key).exists():
+            session_data = Session.objects.get(pk=request.session.session_key).get_decoded()
+            TempSession.objects.create(username=user.username, session_data=session_data)
         login(request, user)
         return super(LoginAPIView, self).post(request, format=None)
 
