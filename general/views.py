@@ -47,6 +47,11 @@ class BasketView(TemplateView):
 class CheckoutView(TemplateView):
     template_name = "checkout.html"
 
+class CheckoutSuccessView(TemplateView):
+    template_name = "success.html"
+
+
+
 #     def get_context_data(self, **kwargs):
 #         context = super(BasketView, self).get_context_data(**kwargs)
 #         context_list = []
