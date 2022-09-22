@@ -28,7 +28,7 @@ class DropDown extends React.Component {
 
   render() {
     return (
-      <DropdownButton
+      <Dropdown.Toggle
         variant={
           !this.props.variant
             ? !this.props.as
@@ -42,8 +42,8 @@ class DropDown extends React.Component {
         as={this.props.as ? this.props.as : "Button"}
         drop={this.props.drop ? this.props.drop : "down"}
       >
-        {this.props.children}
-      </DropdownButton>
+        <Dropdown.Menu>{this.props.children}</Dropdown.Menu>
+      </Dropdown.Toggle>
     );
   }
 }
@@ -88,40 +88,29 @@ class LoginForm extends Component {
   }
   render() {
     return (
-      <Dropdown>
-        <Dropdown.Toggle
-          variant="success"
-          id={this.props.id}
-          as={this.props.as ? this.props.as : Button}
-        >
-          Login
-        </Dropdown.Toggle>
-        <Dropdown.Menu>
-          <Form onSubmit={this.handleSubmit} className="px-4 py-3">
-            <Form.Group controlId="formBasicEmail">
-              <Form.Label>Username</Form.Label>
-              <Form.Control
-                name="username"
-                type="text"
-                placeholder="Enter username"
-                onChange={this.handleChange}
-              />
-            </Form.Group>
-            <Form.Group controlId="formBasicPassword">
-              <Form.Label>Password</Form.Label>
-              <Form.Control
-                name="password"
-                type="password"
-                placeholder="Password"
-                onChange={this.handleChange}
-              />
-            </Form.Group>
-            <Button variant="primary" type="submit">
-              Submit
-            </Button>
-          </Form>
-        </Dropdown.Menu>
-      </Dropdown>
+        <Form onSubmit={this.handleSubmit} className="px-4 py-3">
+        <Form.Group controlId="formBasicEmail">
+            <Form.Label>Username</Form.Label>
+            <Form.Control
+            name="username"
+            type="text"
+            placeholder="Enter username"
+            onChange={this.handleChange}
+            />
+        </Form.Group>
+        <Form.Group controlId="formBasicPassword">
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+            name="password"
+            type="password"
+            placeholder="Password"
+            onChange={this.handleChange}
+            />
+        </Form.Group>
+        <Button variant="primary" type="submit">
+            Submit
+        </Button>
+        </Form>
     );
   }
 }
