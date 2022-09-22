@@ -12,4 +12,3 @@ const Nav = ReactBootstrap.Nav;
 const Badge = ReactBootstrap.Badge;
 const Placeholder = ReactBootstrap.Placeholder;
 const Form = ReactBootstrap.Form;
-const root = ReactDOM.createRoot(document.getElementById('root'));

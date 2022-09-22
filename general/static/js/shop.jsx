@@ -17,20 +17,22 @@ class Alert extends React.Component {
   }
 }
 function Stars(props) {
-    return (
-      <Row className="justify-content-center">
-        {
-          Array.from({length: props.value}, (_, i) =>
-            <i className="fa-solid fa-star text-warning" key={i}></i>
-          )
-        }
-        {
-          Array.from({length: 5 - props.value}, (_, i) =>
-            <i className="fa-regular fa-star text-secondary" key={i}></i>
-          )
-        }
-      </Row>
-    );
+  console.log(props.value);
+  return (
+    <Stack direction="horizontal" className="justify-content-center">
+      {Array.from(Array(5)).map((e, i) => {
+        <i
+          className={`fa-regular fa-star ${
+            i + 1 >= props.value ? "text-warning" : "text-secodary"
+          }`}
+          key={i}
+          onClick={() => props.onClick(i + 1)}
+          onMouseEnter={() => props.onMouseEnter(i + 1)}
+          onMouseLeave={() => props.onMouseLeave()}
+        ></i>;
+      })}
+    </Stack>
+  );
 }
 function Review (props) {
     return (
@@ -48,7 +50,107 @@ function Review (props) {
       </Row>
     );
 }
-class BasketComponents extends React.Component {
+
+class ReviewForm extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            title: '',
+            comment: '',
+            stars: 0,
+        };
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+    starOnClick(value) {
+        this.setState({stars: value});
+    }
+    starsOnMouseEnter(value) {
+        this.setState({stars: value});
+    }
+    starsOnMouseLeave() {
+        this.setState({stars: 0});
+    }
+    handleChange(event) {
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+        this.setState({
+            [name]: value
+        });
+    }
+    handleSubmit(event) {
+        event.preventDefault();
+        const data = {
+            title: this.state.title,
+            comment: this.state.comment,
+            stars: this.state.stars,
+        };
+        $.ajax({
+            url: `/api/v1/products/${this.props.product.id}/reviews/`,
+            type: 'POST',
+            dataType: 'application/json',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            data: JSON.stringify(data),
+            success: (response) => {
+                this.props.addReview(response);
+                this.setState({
+                    title: '',
+                    comment: '',
+                    stars: 0,
+                });
+            },
+            error: (error) => {
+                console.log(error);
+            }
+        })
+    }
+    render() {
+        return (
+          <Form onSubmit={this.handleSubmit}>
+            <Form.Group controlId="title">
+              <Form.Label>Title</Form.Label>
+              <Form.Control
+                required
+                name="title"
+                type="text"
+                placeholder="Enter title"
+                value={this.state.title}
+                onChange={this.handleChange}
+              />
+            </Form.Group>
+            <Form.Group controlId="comment">
+              <Form.Label>Comment</Form.Label>
+              <Form.Control
+                required
+                name="comment"
+                as="textarea"
+                rows={3}
+                placeholder="Enter comment"
+                value={this.state.comment}
+                onChange={this.handleChange}
+              />
+            </Form.Group>
+            <Form.Group controlId="stars">
+              <Form.Label>Stars</Form.Label>
+              <Stars
+                value={this.state.stars}
+                onClick={(value) => this.starOnClick(value)}
+                onMouseEnter={(value) => this.starsOnMouseEnter(value)}
+                onMouseLeave={this.starsOnMouseLeave}
+              />
+            </Form.Group>
+            <Button variant="primary" type="submit">
+              Submit
+            </Button>
+          </Form>
+        );
+    }
+}
+
+class BasketComponents extends Component {
   static contextType = BasketContext;
   constructor (props) {
     super(props);
@@ -94,6 +196,7 @@ class ProductModal extends React.Component {
   static contextType = AppContext;
   render(){
     const product = this.props.product;
+    console.log(`ProductModal: ${JSON.stringify(product)}`);
     if (product === null) {
       return (
         <Modal
@@ -114,11 +217,11 @@ class ProductModal extends React.Component {
     } else {
       return (
         <Modal
-        show={this.props.show}
-        onHide={this.props.onClose}
-        size="lg"
-        aria-labelledby="product-modal-title"
-        centered
+          show={this.props.show}
+          onHide={this.props.onClose}
+          size="lg"
+          aria-labelledby="product-modal-title"
+          centered
         >
           <Modal.Header closeButton>
             <Modal.Title id="product-modal-title">
@@ -126,28 +229,28 @@ class ProductModal extends React.Component {
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Stack gap={3} className="col-md-5 mx-auto text-center">
+            <Stack gap={2} className="col-md-5 mx-auto text-center">
               <div>
-                <img src={product.img} className="rounded-circle" width={200}/>
+                <img src={product.img} className="rounded-circle" width={200} />
               </div>
+              <Stars value={product.average_rating} />
               <div>
+                <p className="mb-0 fs-5">€{product.price}</p>
                 <p>{product.description}</p>
-                <p>{product.price}</p>
               </div>
-              <Stars value={product.average_rating}/>
-              <BasketComponents
-              id={product.id}
-              amount={product.quantity}
-              />
-              {
-                product.reviews.map(review =>
-                  <Review review={review} key={review.id}/>
-                )
-              }
+              <BasketComponents id={product.id} amount={product.quantity} />
+              {product.reviews &&
+                product.reviews.map((review) => (
+                  <Review review={review} key={review.id} />
+                ))}
+                {
+                  auth == 'true' &&
+                  <ReviewForm product={product} addReview={this.props.addReview} />
+                }
             </Stack>
           </Modal.Body>
         </Modal>
-      )
+      );
     }
   }
 }
@@ -177,13 +280,27 @@ class Products extends React.Component {
         item => item.id === i
       )
       prod.quantity = 1;
-      prod.reviews = [];
-      prod.average_rating = 0;
+    } else {
+      let product = this.context.products.find(
+        item => item.id === i
+      )
+      prod.reviews = product.reviews;
+      prod.average_rating = product.average_rating;
     }
     this.setState({
       item: prod,
     });
     this.handleShow();
+  }
+  addReview(review) {
+    let prod = this.context.products.find(
+      item => item.id === review.product
+    )
+    prod.reviews.push(review);
+    prod.average_rating = (prod.average_rating + review.stars) / prod.reviews.length;
+    this.setState({
+      item: prod,
+    });
   }
   render() {
     const products = this.context.products;
@@ -222,6 +339,7 @@ class Products extends React.Component {
               show={this.state.show}
               onClose={()=>this.handleClose()}
               product={this.state.item}
+              addReview={(review) => this.addReview(review)}
             />
           </Container>
         );
@@ -244,4 +362,5 @@ const element = (
     <Shop/>
   </>
 );
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(element);

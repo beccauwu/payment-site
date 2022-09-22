@@ -80,9 +80,16 @@ class Checkout extends Component {
             appearance: this.state.appearance
         }
         return (
+          <App>
             <Elements options={options} stripe={stripePromise}>
-                <InjectedCheckoutForm />
+              <InjectedCheckoutForm />
             </Elements>
-        )
+          </App>
+        );
     }
 }
+const element = (
+    <Checkout />
+)
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(element);
