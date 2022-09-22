@@ -267,3 +267,15 @@ class ReviewViewSet(ModelViewSet):
     def list(self, request):
         data = super().list(request)
         return data
+
+class SetReview(APIView):
+    def post(self, request, pk):
+        product = Product.objects.get(id=pk)
+        review = Review.objects.create(
+            product=product,
+            user=request.user,
+            comment=request.data['comment'],
+            stars=request.data['stars']
+        )
+        review.save()
+        return Response({'success': 'true'})
