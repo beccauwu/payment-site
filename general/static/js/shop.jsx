@@ -52,12 +52,13 @@ function Review (props) {
 }
 
 class ReviewForm extends Component {
+  static contextType = AppContext
     constructor(props) {
         super(props);
         this.state = {
-            title: '',
-            comment: '',
-            stars: 0,
+            title: null,
+            comment: null,
+            stars: null,
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -87,10 +88,11 @@ class ReviewForm extends Component {
             stars: this.state.stars,
         };
         $.ajax({
-            url: `/api/v1/products/${this.props.product.id}/reviews/`,
+            url: `http://127.0.0.1:8000/api/products/${this.props.product.id}/reviews/`,
             type: 'POST',
             dataType: 'application/json',
             headers: {
+                'Authorization': `Token ${this.context.auth.token}`,
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             data: JSON.stringify(data),
@@ -108,6 +110,9 @@ class ReviewForm extends Component {
         })
     }
     render() {
+      if (this.context.auth) {
+        const filled =
+          (this.state.title && this.state.comment && this.state.stars) !== null;
         return (
           <Form onSubmit={this.handleSubmit}>
             <Form.Group controlId="title">
@@ -142,11 +147,26 @@ class ReviewForm extends Component {
                 onMouseLeave={this.starsOnMouseLeave}
               />
             </Form.Group>
-            <Button variant="primary" type="submit">
+            <Button
+              variant="primary"
+              type={filled ? "submit" : "button"}
+              {...(filled ? {} : { disabled: true })}
+            >
               Submit
             </Button>
           </Form>
         );
+      } else {
+        return (
+          <DropDown
+          as="a"
+          title="Login"
+          id="login-dropdown"
+          >
+            <LoginForm/>
+          </DropDown>
+        );
+      }
     }
 }
 
@@ -244,8 +264,8 @@ class ProductModal extends React.Component {
                   <Review review={review} key={review.id} />
                 ))}
                 {
-                  auth == 'true' &&
-                  <ReviewForm product={product} addReview={this.props.addReview} />
+                  auth == 'false' &&
+                  <ReviewForm product={product} addReview={(review)=>this.props.addReview(review)} />
                 }
             </Stack>
           </Modal.Body>
