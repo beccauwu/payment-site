@@ -8,5 +8,4 @@ urlpatterns = [
     path('testint/', views.APITest.as_view(), name='test'),
     path('checkout/', views.CheckoutView.as_view(), name='checkout'),
     path('checkout/success/', views.CheckoutSuccessView.as_view(), name='checkout_success'),
-    path('products/<int:pk>', views.ProductDetailView.as_view(), name='product_detail'),
 ]
