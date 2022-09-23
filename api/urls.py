@@ -32,6 +32,7 @@ urlpatterns = [
     path('auth/logout/', knox_views.LogoutView.as_view(), name='logout_api'),
     path('common/reviews/', ReviewViewSet.as_view(), name='review_api'),
     path('save/', WriteReadme.as_view(), name='write_readme'),
+    path('products/<int:pk>/reviews/', SetReview.as_view(), name='set_review'),
 ]
 
 urlpatterns += router.urls
