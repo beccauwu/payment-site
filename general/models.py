@@ -8,7 +8,7 @@ def nameFile(instance, filename):
 
 class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='reviews')
     title = models.CharField(max_length=255)
     stars = models.IntegerField(null=True, blank=True)
     comment = models.TextField(null=True, blank=True)
