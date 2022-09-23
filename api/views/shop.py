@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import permissions, status
+from knox.auth import TokenAuthentication
 from accounts.models import Profile
 from payments.models import Product, Price, Order
 from general.models import Review
@@ -269,7 +270,10 @@ class ReviewViewSet(ModelViewSet):
         return data
 
 class SetReview(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
     def post(self, request, pk):
+        print(request.data)
         product = Product.objects.get(id=pk)
         review = Review.objects.create(
             product=product,
@@ -278,4 +282,10 @@ class SetReview(APIView):
             stars=request.data['stars']
         )
         review.save()
-        return Response({'success': 'true'})
+        return Response({'review': ReviewSerializer(review).data})
+
+class GetReviews(APIView):
+    def get(self, request, pk):
+        reviews = Review.objects.filter(product_id=pk)
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
