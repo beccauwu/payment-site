@@ -16,6 +16,7 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ReviewSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(source="user.username", read_only=True)
     class Meta:
         model = Review
         fields = ('id', 'user', 'title', 'stars', 'comment', )
