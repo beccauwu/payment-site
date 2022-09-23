@@ -12,3 +12,6 @@ const Nav = ReactBootstrap.Nav;
 const Badge = ReactBootstrap.Badge;
 const Placeholder = ReactBootstrap.Placeholder;
 const Form = ReactBootstrap.Form;
+const Dropdown = ReactBootstrap.Dropdown;
+const DropdownButton = ReactBootstrap.DropdownButton;
+const Pagination = ReactBootstrap.Pagination;

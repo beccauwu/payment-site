@@ -2,6 +2,10 @@ const AppContext = React.createContext();
 const BasketContext = React.createContext();
 const AuthContext = React.createContext();
 
+const ContainerRef = React.forwardRef((props, ref) => {
+    <div ref={ref} className={props.className}></div>
+});
+
 function getCookie(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== "") {
@@ -17,8 +21,17 @@ function getCookie(name) {
   }
   return cookieValue;
 }
+/**
+   *
+   * @param {string} variant
+   * @param {string} as
+   * @param {string} id
+   * @param {string} drop
+   * @param {string} title
+   * @param {string} renderOnMount
+   */
+class DropDown extends Component {
 
-class DropDown extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -28,7 +41,7 @@ class DropDown extends React.Component {
 
   render() {
     return (
-      <Dropdown.Toggle
+      <DropdownButton
         variant={
           !this.props.variant
             ? !this.props.as
@@ -40,10 +53,13 @@ class DropDown extends React.Component {
         }
         id={this.props.id}
         as={this.props.as ? this.props.as : "Button"}
-        drop={this.props.drop ? this.props.drop : "down"}
-      >
-        <Dropdown.Menu>{this.props.children}</Dropdown.Menu>
-      </Dropdown.Toggle>
+        drop={this.props.drop}
+        title={this.props.title}
+        renderMenuOnMount={
+          this.props.renderOnMount ? this.props.renderOnMount : true
+        }
+        menuVariant='dark'
+      >{this.props.children}</DropdownButton>
     );
   }
 }
@@ -55,6 +71,7 @@ class LoginForm extends Component {
       username: "",
       password: "",
       error: null,
+      visible: false,
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -67,9 +84,9 @@ class LoginForm extends Component {
       password: this.state.password,
     };
     $.ajax({
-      url: "http://127.0.0.1:8000/api/login/",
+      url: "http://127.0.0.1:8000/api/auth/login/",
       type: "POST",
-      data: JSON.stringify(data),
+      data: data,
       headers: {
         "X-CSRFToken": csrftoken,
       },
@@ -79,7 +96,7 @@ class LoginForm extends Component {
         localStorage.setItem("auth", JSON.stringify(data));
       },
       error: function (xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
+        console.error(status, err.toString());
       },
     });
   }
@@ -88,29 +105,34 @@ class LoginForm extends Component {
   }
   render() {
     return (
-        <Form onSubmit={this.handleSubmit} className="px-4 py-3">
-        <Form.Group controlId="formBasicEmail">
+      <Form
+        className={"py-4 px-3 " + this.props.className}
+        ref={this.props.ref}
+      >
+        <Stack gap={2}>
+          <Form.Group controlId="formBasicEmail">
             <Form.Label>Username</Form.Label>
             <Form.Control
-            name="username"
-            type="text"
-            placeholder="Enter username"
-            onChange={this.handleChange}
+              name="username"
+              type="text"
+              placeholder="Username"
+              onChange={this.handleChange}
             />
-        </Form.Group>
-        <Form.Group controlId="formBasicPassword">
+          </Form.Group>
+          <Form.Group controlId="formBasicPassword">
             <Form.Label>Password</Form.Label>
             <Form.Control
-            name="password"
-            type="password"
-            placeholder="Password"
-            onChange={this.handleChange}
+              name="password"
+              type="password"
+              placeholder="Password"
+              onChange={this.handleChange}
             />
-        </Form.Group>
-        <Button variant="primary" type="submit">
-            Submit
-        </Button>
-        </Form>
+          </Form.Group>
+          <Button variant="primary" type="submit" onClick={this.handleSubmit}>
+            Login
+          </Button>
+        </Stack>
+      </Form>
     );
   }
 }
@@ -135,10 +157,46 @@ class PlaceHolder extends Component {
     );
   }
 }
+class Basket extends Component {
+  static contextType = AppContext;
+  render() {
+    return (
+      <Row className="justify-content-center">
+        {!this.context.basket.length > 0 && (
+          <div>
+            <p>Basket is empty</p>
+          </div>
+        )}
+        {this.context.basket.map((item) => (
+          <div
+            className="clearfix py-2 border-bottom border-black"
+            key={item.id}
+          >
+            <div>
+              <img
+                src={item.img}
+                alt="product image"
+                className="float-start me-2 rounded-circle"
+                width={50}
+              />
+              <span className="d-block pt-1 giBold">{item.prod_name}</span>
+              <span className="text-info me-2">€{item.price}</span>
+              <span className="text-primary fw-light">x{item.quantity}</span>
+            </div>
+            <div>
+              <span className="fw-light text-primary d-block wi-fc float-end">
+                Net Total: €{item.price * item.quantity}
+              </span>
+            </div>
+          </div>
+        ))}
+      </Row>
+    );
+  }
+}
 class OffCanvas extends Component {
   static contextType = AppContext;
   render() {
-    console.log(`Basket: ${JSON.stringify(this.context.basket)}`);
     if (this.context.basketError) {
       return <Alert type="error" message={this.context.basketError.message} />;
     } else if (!this.context.basketIsLoaded) {
@@ -165,40 +223,7 @@ class OffCanvas extends Component {
           </Offcanvas.Header>
           <Offcanvas.Body>
             <Container fluid>
-              <Row className="justify-content-center">
-                {!this.context.basket.length > 0 && (
-                  <div>
-                    <p>Basket is empty</p>
-                  </div>
-                )}
-                {this.context.basket.map((item) => (
-                  <div
-                    className="clearfix py-2 border-bottom border-black"
-                    key={item.id}
-                  >
-                    <div>
-                      <img
-                        src={item.img}
-                        alt="product image"
-                        className="float-start me-2 rounded-circle"
-                        width={50}
-                      />
-                      <span className="d-block pt-1 giBold">
-                        {item.prod_name}
-                      </span>
-                      <span className="text-info me-2">€{item.price}</span>
-                      <span className="text-primary fw-light">
-                        x{item.quantity}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="fw-light text-primary d-block wi-fc float-end">
-                        Net Total: €{item.price * item.quantity}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </Row>
+              <Basket />
             </Container>
           </Offcanvas.Body>
         </Offcanvas>
@@ -222,6 +247,15 @@ class HeaderNavbar extends Component {
             <Nav.Link href="/shop">Shop</Nav.Link>
           </Nav>
           <Nav>
+            <DropDown
+            as={Nav.Link}
+            drop="start"
+            id="login-dropdown"
+            title="Login">
+              <LoginForm/>
+            </DropDown>
+          </Nav>
+          <Nav>
             {this.context.basketIsLoaded && (
               <Nav.Link as="span" onClick={this.props.onShow}>
                 <i className="fa-solid fa-basket-shopping"></i> Basket
@@ -235,7 +269,7 @@ class HeaderNavbar extends Component {
   }
 }
 
-class Footer extends React.Component {
+class Footer extends Component {
   render() {
     return (
       <footer className="footer py-3 bg-dark mt-auto">
