@@ -117,6 +117,15 @@ class RegisterForm extends Component {
               onChange={this.handleChange}
             />
           </Form.Group>
+          <Form.Group controlId="formBasicUsername">
+            <Form.Label>Username</Form.Label>
+            <Form.Control
+              name="username"
+              type="text"
+              placeholder="Username"
+              onChange={this.handleChange}
+            />
+          </Form.Group>
           <Form.Group controlId="formBasicPassword">
             <Form.Label>Password</Form.Label>
             <Form.Control
@@ -126,12 +135,21 @@ class RegisterForm extends Component {
               onChange={this.handleChange}
             />
           </Form.Group>
+          <Form.Group controlId="formBasicPassword2">
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              name="password"
+              type="password"
+              placeholder="Password"
+              onChange={this.handleChange}
+            />
+          </Form.Group>
           <Button variant="primary" type="submit" onClick={this.handleSubmit}>
-            Login
-          </Button>
-          <a href="#" onClick={() => this.props.onClick()}>
             Register
-          </a>
+          </Button>
+          <Button as="a" onClick={() => this.props.onClick()}>
+            Already have an account?
+          </Button>
         </Stack>
       </Form>
     );
@@ -200,7 +218,7 @@ class LoginForm extends Component {
           <Button variant="primary" type="submit" onClick={this.handleSubmit}>
             Login
           </Button>
-          <Button as="a" onClick={()=>this.props.onClick()}>Register</Button>
+          <Button as="a" onClick={()=>this.props.onClick()}>Don't have an account?</Button>
         </Stack>
       </Form>
     );
@@ -213,7 +231,7 @@ class AuthForms extends Component {
     this.state = {
       form: 0,
     };
-    this.handleFormChange = this.handleFormChange.bind(this);
+    this.handleChange = this.handleFormChange.bind(this);
   }
   handleFormChange() {
     this.state.form == 0
@@ -225,10 +243,10 @@ class AuthForms extends Component {
       <div>
         {this.state.form == 0 ? (
           <LoginForm className={this.props.className}
-          onClick={()=>this.handleFormChange(1)}/>
+          onClick={this.handleChange}/>
         ) : (
           <RegisterForm className={this.props.className}
-          onClick={()=>this.handleFormChange(0)}/>
+          onClick={this.handleChange}/>
         )}
       </div>
     );
