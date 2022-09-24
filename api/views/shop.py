@@ -279,7 +279,8 @@ class SetReview(APIView):
             product=product,
             user=request.user,
             comment=request.data['comment'],
-            stars=request.data['stars']
+            stars=request.data['stars'],
+            title=request.data['title']
         )
         review.save()
         return Response({'review': ReviewSerializer(review).data})
