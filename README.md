@@ -4,16 +4,19 @@
 
 The site is a demo for a Django Rest Framework-backend, ReactJs-frontend e-commerce website.
 
-x. Functionality
+## x. Features and UX
 
-### 1\. Front\-end
+### 1. Front-end
 
 ---
 
 For the front end, I chose to use ReactJS. I started the project with plain JavaScript but soon realised that the functionality I have planned would require unreasonably much effort in plain JS.
 React was a great alternative due to the ability for state management and managing context natively. This and the fact that I would be able to use the same few components throughout made the choice to completely remake core logic surprisingly easy.
 
-## 2.
+### 2. Back-end
+
+### x. Tables
+![table structure](assets/graphviz.svg)
 
 ## x. Deployment
 
