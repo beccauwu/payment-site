@@ -59,17 +59,19 @@ class DropDown extends Component {
           this.props.renderOnMount ? this.props.renderOnMount : true
         }
         menuVariant='dark'
+        onClick={()=>this.props.onClick()}
       >{this.props.children}</DropdownButton>
     );
   }
 }
-
-class LoginForm extends Component {
+class RegisterForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
       username: "",
       password: "",
+      password2: "",
+      email: "",
       error: null,
       visible: false,
     };
@@ -78,18 +80,14 @@ class LoginForm extends Component {
   }
   handleSubmit(event) {
     event.preventDefault();
-    const csrftoken = getCookie("csrftoken");
     const data = {
       username: this.state.username,
       password: this.state.password,
     };
     $.ajax({
-      url: "http://127.0.0.1:8000/api/auth/login/",
+      url: "http://127.0.0.1:8000/api/auth/register/",
       type: "POST",
       data: data,
-      headers: {
-        "X-CSRFToken": csrftoken,
-      },
       dataType: "json",
       cache: false,
       success: function (data) {
@@ -131,8 +129,108 @@ class LoginForm extends Component {
           <Button variant="primary" type="submit" onClick={this.handleSubmit}>
             Login
           </Button>
+          <a href="#" onClick={() => this.props.onClick()}>
+            Register
+          </a>
         </Stack>
       </Form>
+    );
+  }
+}
+class LoginForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: "",
+      password: "",
+      error: null,
+      visible: false,
+    };
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+  }
+  handleSubmit(event) {
+    event.preventDefault();
+    const data = {
+      username: this.state.username,
+      password: this.state.password,
+    };
+    $.ajax({
+      url: "http://127.0.0.1:8000/api/auth/login/",
+      type: "POST",
+      data: data,
+      dataType: "json",
+      cache: false,
+      success: function (data) {
+        localStorage.setItem("auth", JSON.stringify(data));
+      },
+      error: function (xhr, status, err) {
+        console.error(status, err.toString());
+      },
+    });
+  }
+  handleChange(event) {
+    this.setState({ [event.target.name]: event.target.value });
+  }
+  render() {
+    return (
+      <Form
+        className={"py-4 px-3 " + this.props.className}
+        ref={this.props.ref}
+      >
+        <Stack gap={2}>
+          <Form.Group controlId="formBasicEmail">
+            <Form.Label>Username</Form.Label>
+            <Form.Control
+              name="username"
+              type="text"
+              placeholder="Username"
+              onChange={this.handleChange}
+            />
+          </Form.Group>
+          <Form.Group controlId="formBasicPassword">
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              name="password"
+              type="password"
+              placeholder="Password"
+              onChange={this.handleChange}
+            />
+          </Form.Group>
+          <Button variant="primary" type="submit" onClick={this.handleSubmit}>
+            Login
+          </Button>
+          <Button as="a" onClick={()=>this.props.onClick()}>Register</Button>
+        </Stack>
+      </Form>
+    );
+  }
+}
+
+class AuthForms extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      form: 0,
+    };
+    this.handleFormChange = this.handleFormChange.bind(this);
+  }
+  handleFormChange() {
+    this.state.form == 0
+      ? this.setState({ form: 1 })
+      : this.setState({ form: 0 });
+  }
+  render() {
+    return (
+      <div>
+        {this.state.form == 0 ? (
+          <LoginForm className={this.props.className}
+          onClick={()=>this.handleFormChange(1)}/>
+        ) : (
+          <RegisterForm className={this.props.className}
+          onClick={()=>this.handleFormChange(0)}/>
+        )}
+      </div>
     );
   }
 }
@@ -234,6 +332,10 @@ class OffCanvas extends Component {
 
 class HeaderNavbar extends Component {
   static contextType = AppContext;
+  handleLogout(){
+    localStorage.removeItem('auth');
+    this.context.setAuth(null);
+  }
   render() {
     return (
       <Navbar bg="dark" variant="dark" expand="lg">
@@ -247,13 +349,21 @@ class HeaderNavbar extends Component {
             <Nav.Link href="/shop">Shop</Nav.Link>
           </Nav>
           <Nav>
-            <DropDown
-            as={Nav.Link}
-            drop="start"
-            id="login-dropdown"
-            title="Login">
-              <LoginForm/>
-            </DropDown>
+            {!this.context.auth
+            ? (
+              <DropDown
+                as={Nav.Link}
+                drop="start"
+                id="login-dropdown"
+                title="Login"
+              >
+                <LoginForm />
+              </DropDown>
+            )
+            : (
+              <Nav.Link href="#" onClick={()=>this.handleLogout()}>Logout</Nav.Link>
+            )
+          }
           </Nav>
           <Nav>
             {this.context.basketIsLoaded && (
@@ -285,6 +395,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      error: null,
       prodError: null,
       basketError: null,
       isLoaded: false,
@@ -292,10 +403,13 @@ class App extends Component {
       basket: [],
       products: [],
       auth: JSON.parse(localStorage.getItem("auth")),
+      setAuth: (auth) => {
+        this.setState({ auth: auth });
+      }
     };
   }
   componentDidMount() {
-    this.getItems();
+    this.load();
   }
   handleShow() {
     this.setState({ showOc: true });
@@ -303,60 +417,77 @@ class App extends Component {
   handleClose() {
     this.setState({ showOc: false });
   }
+  load(){
+    $.ajax({
+      url: "http://127.0.0.1:8000/api/load/",
+      type: "GET",
+      dataType: "json",
+      success: () => {
+        this.getItems();
+      },
+      error: (error) => {
+        this.setState({
+          error: error,
+        });
+      }
+    })
+  }
   getItems() {
     $.ajax({
       url: "http://127.0.0.1:8000/api/shop/basket/",
+      type: "GET",
       dataType: "json",
-      cache: false,
-      success: function (data) {
+      success: (result) => {
         this.setState({
-          basket: data,
           basketIsLoaded: true,
+          basket: result,
         });
-      }.bind(this),
-      error: function (xhr, status, err) {
+      },
+      error: (error) => {
         this.setState({
-          basketError: err,
           basketIsLoaded: true,
+          basketError: error,
         });
-        console.error(this.props.url, status, err.toString());
-      }.bind(this),
+      }
     });
     $.ajax({
       url: "http://127.0.0.1:8000/api/shop/products/",
+      type: "GET",
       dataType: "json",
-      cache: false,
-      success: function (data) {
+      success: (result) => {
         this.setState({
-          products: data,
           prodIsLoaded: true,
+          products: result,
         });
-      }.bind(this),
-      error: function (xhr, status, err) {
+      },
+      error: (error) => {
         this.setState({
-          prodError: err,
           prodIsLoaded: true,
+          prodError: error,
         });
-        console.error(this.props.url, status, err.toString());
-      }.bind(this),
+      }
     });
   }
   render() {
-    return (
-      <AppContext.Provider value={this.state}>
-        <BasketContext.Provider
-          value={{
-            setBasket: (data) =>
-              this.setState({ basket: data, basketIsLoaded: true }),
-            waitBasket: () => this.setState({ basketIsLoaded: false }),
-          }}
-        >
-          <HeaderNavbar onShow={() => this.handleShow()} />
-          <OffCanvas onClose={() => this.handleClose()} />
-          {this.props.children}
-          <Footer />
-        </BasketContext.Provider>
-      </AppContext.Provider>
-    );
+    if (this.state.error) {
+      return <Alert type="error" message={this.state.error} />;
+    } else {
+      return (
+        <AppContext.Provider value={this.state}>
+          <BasketContext.Provider
+            value={{
+              setBasket: (data) =>
+                this.setState({ basket: data, basketIsLoaded: true }),
+              waitBasket: () => this.setState({ basketIsLoaded: false }),
+            }}
+          >
+            <HeaderNavbar onShow={() => this.handleShow()} />
+            <OffCanvas onClose={() => this.handleClose()} />
+            {this.props.children}
+            <Footer />
+          </BasketContext.Provider>
+        </AppContext.Provider>
+      );
+    }
   }
 }
