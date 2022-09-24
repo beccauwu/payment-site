@@ -42,7 +42,7 @@ class UserAPIView(generics.GenericAPIView):
                 return Response({'nomatch': 'true'})
         else:
             return Response({'message': "You are already logged in."})
-        
+
 class IsAuthenticated(permissions.BasePermission, APIView):
     def get(self, request):
         return Response({'auth': request.user.is_authenticated})
@@ -71,14 +71,10 @@ class CookieConsentAPIView(APIView):
 
 class LoginAPIView(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)
-
     def post(self, request, format=None):
         serializer = AuthTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
-        if Session.objects.filter(pk=request.session.session_key).exists():
-            session_data = Session.objects.get(pk=request.session.session_key).get_decoded()
-            TempSession.objects.create(username=user.username, session_data=session_data)
         login(request, user)
         return super(LoginAPIView, self).post(request, format=None)
 
