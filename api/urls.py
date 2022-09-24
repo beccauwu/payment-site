@@ -17,6 +17,7 @@ from rest_framework import routers
 router = routers.DefaultRouter()
 router.register('shop/products', ProductViewSet, basename='products')
 router.register('shop/basket/get', BasketViewSet, basename='basket')
+router.register('load', PreloadStripe, basename='load')
 
 urlpatterns = [
     path('shop/basket/', BasketAPI.as_view(), name='basket_api'),
@@ -24,7 +25,6 @@ urlpatterns = [
     path('shop/basket/delete/', DeleteAll.as_view(), name='delete_all'),
     path('shop/checkout/', CheckoutAPI.as_view(), name='checkout_api'),
     path('shop/checkout/update/', PaymentIntentUpdate.as_view(), name='checkout_update_api'),
-    path('msg/view/', MessageViewSet.as_view({'get': 'list'}), name='msg_api'),
     path('auth/users/', UserAPIView.as_view(), name='user_api'),
     path('auth/users/create/', UserAPIView.as_view(), name='user_api'),
     path('auth/status/', IsAuthenticated.as_view(), name='is_authenticated'),
