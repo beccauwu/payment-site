@@ -51,7 +51,6 @@ function Review(props) {
     </Stack>
   );
 }
-
 class ReviewForm extends Component {
   static contextType = AppContext;
   constructor(props) {
@@ -91,6 +90,7 @@ class ReviewForm extends Component {
       comment: this.state.comment,
       stars: this.state.stars,
     };
+    console.log(data)
     $.ajax({
       url: `http://127.0.0.1:8000/api/products/${this.props.product.id}/reviews/`,
       type: "POST",
@@ -99,7 +99,11 @@ class ReviewForm extends Component {
         Authorization: `Token ${this.context.auth.token}`,
         "X-CSRFToken": getCookie("csrftoken"),
       },
-      data: JSON.stringify(data),
+      data: {
+        title: this.state.title,
+        comment: this.state.comment,
+        stars: this.state.stars,
+      },
       success: (response) => {
         this.props.addReview(response);
         this.setState({
