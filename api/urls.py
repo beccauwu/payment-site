@@ -17,7 +17,6 @@ from rest_framework import routers
 router = routers.DefaultRouter()
 router.register('shop/products', ProductViewSet, basename='products')
 router.register('shop/basket/get', BasketViewSet, basename='basket')
-router.register('load', PreloadStripe, basename='load')
 
 urlpatterns = [
     path('shop/basket/', BasketAPI.as_view(), name='basket_api'),
@@ -33,6 +32,7 @@ urlpatterns = [
     path('common/reviews/', ReviewViewSet.as_view(), name='review_api'),
     path('save/', WriteReadme.as_view(), name='write_readme'),
     path('products/<int:pk>/reviews/', SetReview.as_view(), name='set_review'),
+    path('load/', PreloadStripe.as_view(), name='preload_stripe'),
 ]
 
 urlpatterns += router.urls
