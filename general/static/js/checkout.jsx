@@ -5,9 +5,14 @@ const stripePromise = Stripe(
 const Elements = ReactStripe.Elements;
 const PaymentElement = ReactStripe.PaymentElement;
 const ElementsConsumer = ReactStripe.ElementsConsumer;
-
 class CheckoutForm extends Component {
+    constructor(props) {
+        super(props);
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
   handleSubmit = async (event) => {
+    console.log(event)
+    console.log(this.props)
     event.preventDefault();
     const { stripe, elements } = this.props;
     if (!stripe || !elements) {
@@ -29,18 +34,17 @@ class CheckoutForm extends Component {
   };
   render() {
     return (
-        <form onSubmit={this.handleSubmit}>
+        <>
           <Stack
             gap={3}
           >
             <PaymentElement />
-            <Button disabled={!this.props.stripe}>Submit</Button>
+            <Button disabled={!this.props.stripe} onClick={this.handleSubmit}>Submit</Button>
           </Stack>
-        </form>
+        </>
     );
   }
 }
-
 function InjectedCheckoutForm() {
   return (
     <ElementsConsumer>
