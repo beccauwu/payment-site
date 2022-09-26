@@ -2,7 +2,7 @@ import React from 'react';
 import { Component } from 'react';
 const AppContext = React.createContext();
 const BasketContext = React.createContext();
-
+const CombinedContext = React.createContext();
 export const contexttypes = {
     app: AppContext,
     basket: BasketContext
@@ -118,18 +118,29 @@ export default class Context extends Component {
       return <Alert variant="danger">{this.state.error.responseText}</Alert>;
     } else {
       return (
-        <AppContext.Provider value={this.state}>
-          <BasketContext.Provider
-            value={{
-              setBasket: (data) =>
-                this.setState({ basket: data, basketIsLoaded: true }),
-              waitBasket: () => this.setState({ basketIsLoaded: false }),
-            }}
-          >
-            {this.props.children}
-          </BasketContext.Provider>
-        </AppContext.Provider>
+        <AppContext.Consumer>
+          {(app) => (
+            <BasketContext.Consumer>
+              {(basket) => (
+                <CombinedContext.Provider value={{app,basket}}>
+                  {this.props.children}
+                </CombinedContext.Provider>
+              )}
+            </BasketContext.Consumer>
+          )}
+        </AppContext.Consumer>
       );
     }
   }
 }
+{/* <AppContext.Consumer value={this.state}>
+  <BasketContext.Provider
+    value={{
+      setBasket: (data) =>
+        this.setState({ basket: data, basketIsLoaded: true }),
+      waitBasket: () => this.setState({ basketIsLoaded: false }),
+    }}
+  >
+    {this.props.children}
+  </BasketContext.Provider>
+</AppContext.Consumer>; */}
