@@ -1,6 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
 const BundleTracker = require("webpack-bundle-tracker");
+const Dotenv = require("dotenv-webpack");
 
 module.exports = {
   context: __dirname,
@@ -25,6 +26,9 @@ module.exports = {
   optimization: {
     minimize: false,
   },
-  plugins: [new BundleTracker({ filename: "./webpack-stats.json" })],
+  plugins: [
+    new BundleTracker({ filename: "./webpack-stats.json" }),
+    new Dotenv()
+  ],
   devtool: "eval-source-map",
 };
