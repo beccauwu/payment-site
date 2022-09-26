@@ -22,3 +22,4 @@ django-rest-knox
 djago-extensions
 jsonfield
 Pillow
+git+https://github.com/silviolleite/django-pwa

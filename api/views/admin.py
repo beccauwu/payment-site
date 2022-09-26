@@ -31,13 +31,14 @@ class PreloadStripe(APIView):
             response = stripe.Product.list()
             created = 0
             for itm in response['data']:
-                if Product.objects.filter(stripe_id=itm['id']).exists():
+                if Product.objects.filter(stripe_product_id=itm['id']).exists():
+                    continue
+                elif not itm['images']:
                     continue
                 else:
                     product = Product.objects.create(
-                        name=itm['name'],
-                        stripe_id=itm['id'],
-                        description=itm['description']
+                        prod_name=itm['name'],
+                        stripe_product_id=itm['id']
                     )
                     price_id = itm['default_price']
                     price = stripe.Price.retrieve(price_id)['unit_amount_decimal']

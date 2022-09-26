@@ -206,8 +206,8 @@ class CheckoutAPI(APIView):
         return Response({'success': 'true'})
     def get(self, request):
         basket = Basket(request)
-        print(f"isajax: {request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'}")
         currency = 'eur'
+        total = basket.get_total_price()
         print(request.session.keys())
         print(f"keys: {request.session['userdata']}")
         if not 'userdata' in request.session.keys():
@@ -217,10 +217,10 @@ class CheckoutAPI(APIView):
             intent = stripe.retrieve_payment_intent(request.session['payment_intent_id'])
             print(f"clicent secret payment intent: {intent.client_secret}")
             return Response({'client_secret': intent.client_secret, 'id_set': 'true'})
-        intent = stripe.create_payment_intent(basket.get_total_price(), currency)
+        intent = stripe.create_payment_intent(total, currency)
         pprint(f"session: {request.session['userdata']}")
         print(f"clicent secret: {intent.client_secret}")
-        return Response({'client_secret': intent.client_secret, 'payment_intent_id': intent.id, 'id_set': 'false'})
+        return Response({'client_secret': intent.client_secret, 'payment_intent_id': intent.id, 'total': total})
     def put(self, request):
         print('set client secret')
         request.session['payment_intent_id'] = request.data['payment_intent_id']

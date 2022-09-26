@@ -13,12 +13,7 @@ from django.conf import settings
 # Create your views here.
 
 class HomeView(TemplateView):
-    template_name = "home.html"
-    def get_context_data(self, **kwargs):
-        context = super(HomeView, self).get_context_data(**kwargs)
-        context.update({'nav_home': 'active'})
-        print(context)
-        return context
+    template_name = "base.html"
 
 class ShopView(TemplateView):
     template_name = "shop.html"

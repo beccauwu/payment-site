@@ -15,12 +15,9 @@ def create_session(itms, customer=None):
             cancel_url=settings.BASE_URL + '/purchases/cancel/',
         )
 
-def create_customer(email, full_name, address, tax=None):
+def create_customer(email):
     return stripe.Customer.create(
-        email=email,
-        name=full_name,
-        address=address,
-        tax_exempt=tax
+        email=email
     )
 
 def get_customer_by_email(email=None):

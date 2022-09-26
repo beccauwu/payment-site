@@ -1,7 +1,9 @@
 {% load static %}
+{% load pwa %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% progressive_web_app_meta %}
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,21 +14,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
         integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.0/js/bootstrap.bundle.min.js"
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.0/js/bootstrap.bundle.min.js"
         integrity="sha512-9GacT4119eY3AcosfWtHMsT5JyZudrexyEVzTBWV3viP/YfB9e2pEy3N7WXL3SV6ASXpTU0vzzSxsbfsuUH4sQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/react-bootstrap@next/dist/react-bootstrap.min.js" crossorigin></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script> -->
     {% block head %}
     {% endblock %}
     <title>{% block title %}{% endblock %} - perttula.co</title>
 </head>
 <body>
-<div id="root" class="d-flex flex-column min-vh-100">
-
-</div>
+<div id="root" class="d-flex flex-column min-vh-100"></div>
+<div id="offcanvas-root"></div>
 {% if not request.user.is_authenticated %}
 {% include 'auth/modals.html' %}
 <input id="authCheck" type="hidden" value="true" readonly>
@@ -35,8 +37,8 @@
 {% endif %}
 <script src="https://kit.fontawesome.com/cd478b5352.js" crossorigin="anonymous"></script>
 <!-- <script src="{% static 'js/main.js' %}"></script> -->
-<script src="{% static 'js/definitions.jsx' %}" type="text/babel"></script>
-<script src="{% static 'js/main.jsx' %}" type="text/babel"></script>
+<!-- <script src="{% static 'js/definitions.jsx' %}" type="text/babel"></script> -->
+<script src="{% static 'js/main.js' %}"></script>
 <script>
     const spinner = `<span class="spinner-border spinner-border-sm" id="spinner"><span>`;
     const auth = document.getElementById('authCheck').value;

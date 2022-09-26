@@ -15,7 +15,7 @@ from decouple import config
 import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static', 'js', 'serviceworker.js')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'rest_framework',
     'knox',
+    'pwa',
     'payments',
     'general',
     'accounts',
@@ -193,3 +194,94 @@ NOTEBOOK_ARGUMENTS = [
     '--NotebookApp.default_url', notebook_default_url,
 ]
 IPYTHON_KERNEL_DISPLAY_NAME = 'Django Kernel'
+RUNSERVERPLUS_SERVER_ADDRESS_PORT = '0.0.0.0:8000'
+#pwa config
+PWA_APP_NAME = 'BestShop'
+PWA_APP_DESCRIPTION = "E-commerce website"
+PWA_APP_THEME_COLOR = '#DDA6E0'
+PWA_APP_BACKGROUND_COLOR = '#474747'
+PWA_APP_DISPLAY = 'standalone'
+PWA_APP_SCOPE = '/'
+PWA_APP_ORIENTATION = 'any'
+PWA_APP_START_URL = '/'
+PWA_APP_STATUS_BAR_COLOR = '#DDA6E0'
+PWA_APP_ICONS = [
+    {
+        'src': f'{BASE_URL}/static/img/icons/icon-160x160.png',
+        'sizes': '160x160'
+    },
+    {
+        'src': f'{BASE_URL}/static/img/icons/icon-256x256.png',
+        'sizes': '256x256'
+    },
+    {
+        'src': f'{BASE_URL}/static/img/icons/icon-384x384.png',
+        'sizes': '384x384'
+    },
+    {
+        'src': f'{BASE_URL}/static/img/icons/icon-512x512.png',
+        'sizes': '512x512'
+    }
+]
+PWA_APP_ICONS_APPLE = [
+     {
+        'src': f'{BASE_URL}/static/img/icons/icon-160x160.png',
+        'sizes': '160x160'
+    },
+    {
+        'src': f'{BASE_URL}/static/img/icons/icon-256x256.png',
+        'sizes': '256x256'
+    },
+    {
+        'src': f'{BASE_URL}/static/img/icons/icon-384x384.png',
+        'sizes': '384x384'
+    },
+    {
+        'src': f'{BASE_URL}/static/img/icons/icon-512x512.png',
+        'sizes': '512x512'
+    }
+]
+PWA_APP_SPLASH_SCREEN = [
+    {
+        'src': f'{BASE_URL}/static/img/splashscreens/iphone5_splash.png',
+        'media': '(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)'
+    },
+    {
+        'src': f'{BASE_URL}/static/img/splashscreens/iphone6_splash.png',
+        'media': '(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)'
+    },
+    {
+        'src': f'{BASE_URL}/static/img/splashscreens/iphoneplus_splash.png',
+        'media': '(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)'
+    },
+    {
+        'src': f'{BASE_URL}/static/img/splashscreens/iphonex_splash.png',
+        'media': '(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)'
+    },
+    {
+        'src': f'{BASE_URL}/static/img/splashscreens/iphonexr_splash.png',
+        'media': '(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)'
+    },
+    {
+        'src': f'{BASE_URL}/static/img/splashscreens/iphonexmax_splash.png',
+        'media': '(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)'
+    },
+    {
+        'src': f'{BASE_URL}/static/img/splashscreens/ipad_splash.png',
+        'media': '(device-width: 798px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)'
+    },
+    {
+        'src': f'{BASE_URL}/static/img/splashscreens/ipadpro1_splash.png',
+        'media': '(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)'
+    },
+    {
+        'src': f'{BASE_URL}/static/img/splashscreens/ipadpro3_splash.png',
+        'media': '(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)'
+    },
+    {
+        'src': f'{BASE_URL}/static/img/splashscreens/ipadpro2_splash.png',
+        'media': '(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)'
+    },
+]
+PWA_APP_DIR = 'ltr'
+PWA_APP_LANG = 'en-UK'

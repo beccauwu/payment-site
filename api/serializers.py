@@ -35,6 +35,7 @@ class ProductSerializer(serializers.ModelSerializer):
     description = serializers.SerializerMethodField('get_desc')
     reviews = serializers.SerializerMethodField('get_reviews')
     average_rating = serializers.SerializerMethodField('get_average_rating')
+    prod_name = serializers.SerializerMethodField('get_name')
     def get_img_url(self, obj):
         return obj.get_image()
     def get_price(self, obj):
@@ -52,6 +53,9 @@ class ProductSerializer(serializers.ModelSerializer):
         if reviews:
             return math.ceil(sum(ratings) / len(ratings))
         return 0
+    def get_name(self, obj):
+        n = obj.prod_name
+        return n.capitalize()
     class Meta:
         model = Product
         fields = ['id', 'prod_name', 'img', 'price', 'description', 'reviews', 'average_rating']
@@ -73,29 +77,17 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'email', 'profile')
 
 class CreateUserSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer()
     class Meta:
         model = get_user_model()
-        fields = ('username', 'email', 'password', 'profile',)
+        fields = ('username', 'email', 'password', )
 
     def create(self, validated_data):
-        print(f"validated_data: {validated_data}")
-        profile_data = validated_data.pop('profile')
-        print(f"profile_data: {profile_data}")
         email = validated_data.pop('email')
-        full_name = profile_data.pop('full_name')
         username = validated_data.pop('username')
         password = make_password(validated_data.pop('password'))
-        address = profile_data.pop('address')
-        postcode = profile_data.pop('postcode')
-        city = profile_data.pop('city')
-        country = profile_data.pop('country')
         customer = stripe.get_customer_by_email(email)
         if customer is None:
-            customer = stripe.create_customer(
-                email,
-                full_name,
-                {"line1": address, "postal_code": postcode, "city": city, "country": country})
+            customer = stripe.create_customer(email)
         try:
             user = User.objects.get(email=email)
             return user
@@ -104,15 +96,6 @@ class CreateUserSerializer(serializers.ModelSerializer):
                 username=username,
                 email=email,
                 password=password)
-            profile = Profile.objects.create(
-                user=user,
-                full_name=full_name,
-                address=address,
-                postcode=postcode,
-                city=city,
-                country=country,
-                stripe_customer_id=customer.id)
-            profile.save()
             return user
 
 class CookieUnauthSerializer(serializers.ModelSerializer):

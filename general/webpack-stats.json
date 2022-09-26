@@ -1,0 +1,14 @@
+{
+  "status": "done",
+  "assets": {
+    "main.js": {
+      "name": "main.js",
+      "path": "D:\\Documents\\payment-site\\general\\static\\js\\main.js"
+    }
+  },
+  "chunks": {
+    "main": [
+      "main.js"
+    ]
+  }
+}
