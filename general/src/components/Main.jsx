@@ -7,17 +7,18 @@ import {
   Link,
   useRouteMatch,
 } from "react-router-dom";
-import App from './App'
-import Checkout from './pages/Checkout'
-import Home from './pages/Home'
-import Shop from './pages/Shop'
+import { HomePage, ShopPage, CheckoutPage } from "./App";
 
 export default class Main extends Component {
   render() {
     return (
-      <App>
-        <Home/>
-      </App>
+      <Router>
+        <Switch>
+          <Route exact path="/" component={HomePage} />
+          <Route path="/shop" component={ShopPage} />
+          <Route path="/checkout" component={CheckoutPage} />
+        </Switch>
+      </Router>
     );
   }
 }
